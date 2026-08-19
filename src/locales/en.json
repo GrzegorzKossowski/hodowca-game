@@ -1,0 +1,121 @@
+{
+  "app": {
+    "title": "Breeder"
+  },
+  "common": {
+    "animal": {
+      "rabbit": "Rabbit",
+      "sheep": "Sheep",
+      "pig": "Pig",
+      "cow": "Cow",
+      "horse": "Horse",
+      "dogSmall": "Small dog",
+      "dogBig": "Big dog"
+    },
+    "namePlaceholder": "Player name"
+  },
+  "mode": {
+    "subtitle": "Choose how to play",
+    "rulesLink": "📖 Rules and exchange rates",
+    "hotseat": {
+      "title": "Hot seat",
+      "desc": "Play on one screen, passing the device between turns."
+    },
+    "online": {
+      "title": "Online / LAN game",
+      "desc": "Each player on their own device, on the same network.",
+      "warning": "Requires internet while players are connecting."
+    },
+    "bots": {
+      "title": "Play vs computer",
+      "desc": "You against the bots — good for a quick solo round."
+    }
+  },
+  "lobby": {
+    "backToMode": "← Change mode",
+    "title": {
+      "hotseat": "Hot seat — add players",
+      "online": "Waiting room",
+      "bots": "Play vs computer"
+    },
+    "players_one": "PLAYERS ({{count}})",
+    "players_other": "PLAYERS ({{count}})",
+    "addPlayer": "+ Add player (max {{max}})",
+    "roomCode": "ROOM CODE",
+    "roomCodeHint": "Share this code with the other players on the same network",
+    "joined": "JOINED ({{count}}/{{max}})",
+    "onlineWarning": "Connecting players requires internet, even if the game itself then runs over the local network.",
+    "botCount": "NUMBER OF BOTS: {{count}}",
+    "botAggro": "BOT AGGRESSION",
+    "aggro": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Aggressive"
+    },
+    "yourName": "YOUR NAME",
+    "timerToggle": "Turn time limit (60s)",
+    "start": "Start game"
+  },
+  "board": {
+    "turnLabel": "turn",
+    "rollDice": "🎲 Roll dice",
+    "rolling": "Rolling…",
+    "diceResult": "Result: {{a}} {{b}}",
+    "diceHint": "Click to roll the dice",
+    "tabs": {
+      "herd": "Herd",
+      "trade": "Trade",
+      "rivals": "Rivals",
+      "log": "Log"
+    },
+    "yourHerd": "Your herd",
+    "mainPool": "Main pool",
+    "trade": {
+      "title": "Trade animals",
+      "rabbitToSheep": "rabbits → sheep",
+      "sheepToPig": "sheep → pig",
+      "pigToCow": "pigs → cow",
+      "cowToHorse": "cows → horse"
+    },
+    "rivals": "Rivals",
+    "moreRivals": "+{{count}} more",
+    "log": "Turn history",
+    "simulatePredator": "🦊 Simulate predator",
+    "endTurn": "End turn →",
+    "simulateWin": "🏆 Simulate win"
+  },
+  "pass": {
+    "hint": "Pass the device to",
+    "confirm": "Ready, my turn"
+  },
+  "win": {
+    "badge": "Breeder!",
+    "winnerLine": "{{name}} wins!",
+    "standings": "FINAL STANDINGS",
+    "summaryWinner": "Breeder",
+    "summaryAnimals": "{{count}} animals",
+    "playAgain": "Play again",
+    "backToMenu": "Back to menu"
+  },
+  "overlay": {
+    "foxSaved": "The dog chased off the fox!",
+    "wolfSaved": "The big dog chased off the wolf!",
+    "foxAttack": "The fox attacked!",
+    "wolfAttack": "The wolf attacked!",
+    "foxSavedText": "Your herd is safe — no losses this time.",
+    "wolfSavedText": "Your herd is safe — no losses this time.",
+    "foxAttackText": "You lost all the rabbits in your herd.",
+    "wolfAttackText": "You lost some of your larger animals.",
+    "ok": "OK"
+  },
+  "toast": {
+    "herdSafe": "Herd safe 🐕",
+    "herdLost": "Animals lost 😬"
+  },
+  "rules": {
+    "title": "📖 Rules and exchange rates",
+    "rates": "EXCHANGE RATES",
+    "predators": "PREDATORS",
+    "predatorsText": "🦊 The fox eats rabbits. 🐺 The wolf hunts larger animals. A small dog 🐕 chases off the fox, a big dog 🐕‍🦺 chases off the wolf."
+  }
+}

@@ -1,0 +1,52 @@
+import { theme } from './ui/theme'
+import { useGameStore } from './ui/store'
+import { useIsDesktop } from './ui/hooks/useIsDesktop'
+import { ModeScreen } from './ui/screens/ModeScreen'
+import { LobbyScreen } from './ui/screens/LobbyScreen'
+import { BoardScreen } from './ui/screens/BoardScreen'
+import { PassScreen } from './ui/screens/PassScreen'
+import { WinScreen } from './ui/screens/WinScreen'
+import { RulesModal } from './ui/components/RulesModal'
+import { EventOverlay } from './ui/components/EventOverlay'
+import { Toast } from './ui/components/Toast'
+
+function CurrentScreen() {
+  const screen = useGameStore((s) => s.screen)
+  switch (screen) {
+    case 'mode':
+      return <ModeScreen />
+    case 'lobby':
+      return <LobbyScreen />
+    case 'board':
+      return <BoardScreen />
+    case 'pass':
+      return <PassScreen />
+    case 'win':
+      return <WinScreen />
+  }
+}
+
+function App() {
+  useIsDesktop()
+
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        width: '100%',
+        background: theme.color.bg,
+        fontFamily: theme.font.body,
+        color: theme.color.text,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <CurrentScreen />
+      <RulesModal />
+      <EventOverlay />
+      <Toast />
+    </div>
+  )
+}
+
+export default App

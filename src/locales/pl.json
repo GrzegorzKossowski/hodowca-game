@@ -1,0 +1,123 @@
+{
+  "app": {
+    "title": "Hodowca"
+  },
+  "common": {
+    "animal": {
+      "rabbit": "Królik",
+      "sheep": "Owca",
+      "pig": "Świnia",
+      "cow": "Krowa",
+      "horse": "Koń",
+      "dogSmall": "Mały pies",
+      "dogBig": "Duży pies"
+    },
+    "namePlaceholder": "Imię gracza"
+  },
+  "mode": {
+    "subtitle": "Wybierz sposób gry",
+    "rulesLink": "📖 Zasady i przeliczniki",
+    "hotseat": {
+      "title": "Hot seat",
+      "desc": "Gracie przy jednym ekranie, na zmianę podając urządzenie."
+    },
+    "online": {
+      "title": "Gra online / LAN",
+      "desc": "Każdy gracz na swoim urządzeniu, w tej samej sieci.",
+      "warning": "Wymaga internetu przy łączeniu się graczy."
+    },
+    "bots": {
+      "title": "Gra z komputerem",
+      "desc": "Ty kontra boty — dobre na szybką rundę solo."
+    }
+  },
+  "lobby": {
+    "backToMode": "← Zmień tryb",
+    "title": {
+      "hotseat": "Hot seat — dodaj graczy",
+      "online": "Poczekalnia",
+      "bots": "Gra z komputerem"
+    },
+    "players_one": "GRACZE ({{count}})",
+    "players_few": "GRACZE ({{count}})",
+    "players_many": "GRACZE ({{count}})",
+    "players_other": "GRACZE ({{count}})",
+    "addPlayer": "+ Dodaj gracza (max {{max}})",
+    "roomCode": "KOD POKOJU",
+    "roomCodeHint": "Podaj ten kod pozostałym graczom w tej samej sieci",
+    "joined": "DOŁĄCZYLI ({{count}}/{{max}})",
+    "onlineWarning": "Łączenie graczy wymaga internetu, nawet jeśli sama gra działa potem w lokalnej sieci.",
+    "botCount": "LICZBA BOTÓW: {{count}}",
+    "botAggro": "AGRESYWNOŚĆ BOTÓW",
+    "aggro": {
+      "easy": "Łagodna",
+      "medium": "Średnia",
+      "hard": "Agresywna"
+    },
+    "yourName": "TWOJE IMIĘ",
+    "timerToggle": "Limit czasu na turę (60s)",
+    "start": "Rozpocznij grę"
+  },
+  "board": {
+    "turnLabel": "tura",
+    "rollDice": "🎲 Rzuć kośćmi",
+    "rolling": "Rzucanie…",
+    "diceResult": "Wynik: {{a}} {{b}}",
+    "diceHint": "Kliknij, aby rzucić kośćmi",
+    "tabs": {
+      "herd": "Hodowla",
+      "trade": "Wymiana",
+      "rivals": "Rywale",
+      "log": "Log"
+    },
+    "yourHerd": "Twoja hodowla",
+    "mainPool": "Stado główne",
+    "trade": {
+      "title": "Wymiana zwierząt",
+      "rabbitToSheep": "króliki → owca",
+      "sheepToPig": "owce → świnia",
+      "pigToCow": "świnie → krowa",
+      "cowToHorse": "krowy → koń"
+    },
+    "rivals": "Rywale",
+    "moreRivals": "+{{count}} więcej",
+    "log": "Historia tury",
+    "simulatePredator": "🦊 Symuluj drapieżnika",
+    "endTurn": "Zakończ turę →",
+    "simulateWin": "🏆 Symuluj zwycięstwo"
+  },
+  "pass": {
+    "hint": "Przekaż urządzenie graczowi",
+    "confirm": "Gotowe, moja kolej"
+  },
+  "win": {
+    "badge": "Hodowca!",
+    "winnerLine": "{{name}} wygrywa!",
+    "standings": "KOLEJNOŚĆ KOŃCOWA",
+    "summaryWinner": "Hodowca",
+    "summaryAnimals": "{{count}} zwierząt",
+    "playAgain": "Zagraj ponownie",
+    "backToMenu": "Wróć do menu"
+  },
+  "overlay": {
+    "foxSaved": "Pies odgonił lisa!",
+    "wolfSaved": "Duży pies odgonił wilka!",
+    "foxAttack": "Lis zaatakował!",
+    "wolfAttack": "Wilk zaatakował!",
+    "foxSavedText": "Twoja hodowla jest bezpieczna — tym razem obyło się bez strat.",
+    "wolfSavedText": "Twoja hodowla jest bezpieczna — tym razem obyło się bez strat.",
+    "foxAttackText": "Straciłeś wszystkie króliki ze stada.",
+    "wolfAttackText": "Straciłeś część większych zwierząt ze stada.",
+    "ok": "OK"
+  },
+  "toast": {
+    "herdSafe": "Stado bezpieczne 🐕",
+    "herdLost": "Zwierzęta stracone 😬"
+  },
+  "rules": {
+    "title": "📖 Zasady i przeliczniki",
+    "rates": "PRZELICZNIKI",
+    "predators": "DRAPIEŻNIKI",
+    "predatorsText": "🦊 Lis zjada króliki. 🐺 Wilk poluje na większe zwierzęta. Mały pies 🐕 odgania lisa, duży pies 🐕‍🦺 odgania wilka."
+  }
+}
