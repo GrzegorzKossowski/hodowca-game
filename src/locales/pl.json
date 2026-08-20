@@ -49,8 +49,10 @@
     "addPlayer": "+ Dodaj gracza (max {{max}})",
     "roomCode": "KOD POKOJU",
     "roomCodeHint": "Podaj ten kod pozostałym graczom w tej samej sieci",
+    "connectedTo": "POŁĄCZONO Z POKOJEM",
     "joined": "DOŁĄCZYLI ({{count}}/{{max}})",
     "onlineWarning": "Łączenie graczy wymaga internetu, nawet jeśli sama gra działa potem w lokalnej sieci.",
+    "waitingForHost": "Czekanie na hosta…",
     "botCount": "LICZBA BOTÓW: {{count}}",
     "botAggro": "AGRESYWNOŚĆ BOTÓW",
     "aggro": {
@@ -62,12 +64,32 @@
     "timerToggle": "Limit czasu na turę (60s)",
     "start": "Rozpocznij grę"
   },
+  "onlineChoice": {
+    "title": "Gra online / LAN",
+    "yourName": "TWOJE IMIĘ",
+    "chooseAvatar": "Wybierz avatar",
+    "hostButton": "🏠 Załóż pokój",
+    "hostDesc": "Utwórz pokój i podaj kod pozostałym graczom.",
+    "joinButton": "🔗 Dołącz do pokoju",
+    "joinDesc": "Wpisz kod pokoju od gracza, który go założył."
+  },
+  "join": {
+    "title": "Dołącz do pokoju",
+    "back": "← Wstecz",
+    "codeLabel": "KOD POKOJU",
+    "codePlaceholder": "np. AB12CD",
+    "connect": "Połącz",
+    "connecting": "Łączenie…",
+    "errorCode": "Wpisz prawidłowy kod pokoju.",
+    "errorTimeout": "Nie udało się połączyć z tym pokojem. Sprawdź kod i spróbuj ponownie."
+  },
   "board": {
     "turnLabel": "tura",
     "rollDice": "🎲 Rzuć kośćmi",
     "rolling": "Rzucanie…",
     "diceResult": "Wynik: {{a}} {{b}}",
     "diceHint": "Kliknij, aby rzucić kośćmi",
+    "waitingFor": "Czekanie na turę gracza {{player}}…",
     "tabs": {
       "herd": "Hodowla",
       "trade": "Wymiana",

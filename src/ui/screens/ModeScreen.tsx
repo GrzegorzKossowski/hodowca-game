@@ -6,6 +6,7 @@ export function ModeScreen() {
   const { t } = useTranslation()
   const isDesktop = useGameStore((s) => s.isDesktop)
   const selectMode = useGameStore((s) => s.selectMode)
+  const goOnlineChoice = useGameStore((s) => s.goOnlineChoice)
   const openRules = useGameStore((s) => s.openRules)
 
   const modes: { key: Exclude<Mode, null>; emoji: string; title: string; desc: string; warning?: string }[] = [
@@ -52,7 +53,7 @@ export function ModeScreen() {
         {modes.map((m) => (
           <button
             key={m.key}
-            onClick={() => selectMode(m.key)}
+            onClick={() => (m.key === 'online' ? goOnlineChoice() : selectMode(m.key))}
             style={{
               flex: 1,
               textAlign: 'left',

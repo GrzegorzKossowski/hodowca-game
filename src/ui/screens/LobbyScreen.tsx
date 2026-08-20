@@ -9,7 +9,8 @@ export function LobbyScreen() {
 
   const title =
     s.mode === 'hotseat' ? t('lobby.title.hotseat') : s.mode === 'online' ? t('lobby.title.online') : t('lobby.title.bots')
-  const cannotStart = s.players.length < 2
+  const isGuest = s.mode === 'online' && s.netRole === 'guest'
+  const cannotStart = s.players.length < 2 || isGuest
 
   return (
     <div
@@ -122,7 +123,9 @@ export function LobbyScreen() {
       {s.mode === 'online' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div style={{ background: theme.color.accentBg, borderRadius: 16, padding: 18, textAlign: 'center' }}>
-            <div style={{ fontSize: 13, color: theme.color.textMuted, fontWeight: 600 }}>{t('lobby.roomCode')}</div>
+            <div style={{ fontSize: 13, color: theme.color.textMuted, fontWeight: 600 }}>
+              {s.netRole === 'host' ? t('lobby.roomCode') : t('lobby.connectedTo')}
+            </div>
             <div
               style={{
                 fontFamily: theme.font.heading,
@@ -135,7 +138,9 @@ export function LobbyScreen() {
             >
               {s.roomCode}
             </div>
-            <div style={{ fontSize: 12.5, color: theme.color.textMuted, marginTop: 4 }}>{t('lobby.roomCodeHint')}</div>
+            {s.netRole === 'host' && (
+              <div style={{ fontSize: 12.5, color: theme.color.textMuted, marginTop: 4 }}>{t('lobby.roomCodeHint')}</div>
+            )}
           </div>
           <div style={{ fontSize: 13, color: theme.color.textMuted, fontWeight: 600 }}>
             {t('lobby.joined', { count: s.players.length, max: 6 })}
@@ -229,19 +234,46 @@ export function LobbyScreen() {
             </div>
           </div>
           <div style={{ fontSize: 13, color: theme.color.textMuted, fontWeight: 600 }}>{t('lobby.yourName')}</div>
-          <input
-            value={s.soloPlayerName}
-            onChange={(e) => s.setSoloPlayerName(e.target.value)}
-            placeholder={t('common.namePlaceholder')}
-            style={{
-              border: `1.5px solid ${theme.color.cardBorder}`,
-              borderRadius: 12,
-              padding: 12,
-              fontSize: 16,
-              fontFamily: theme.font.body,
-              outline: 'none',
-            }}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button
+              onClick={() => s.toggleAvatarPicker(-1)}
+              style={{
+                fontSize: 24,
+                background: theme.color.accentBg,
+                border: 'none',
+                borderRadius: 10,
+                width: 44,
+                height: 44,
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            >
+              {s.soloPlayerAvatar}
+            </button>
+            <input
+              value={s.soloPlayerName}
+              onChange={(e) => s.setSoloPlayerName(e.target.value)}
+              placeholder={t('common.namePlaceholder')}
+              style={{
+                flex: 1,
+                border: `1.5px solid ${theme.color.cardBorder}`,
+                borderRadius: 12,
+                padding: 12,
+                fontSize: 16,
+                fontFamily: theme.font.body,
+                outline: 'none',
+              }}
+            />
+          </div>
+          {s.pickingAvatarFor === -1 && (
+            <AvatarPicker
+              current={s.soloPlayerAvatar}
+              onSelect={(av) => {
+                s.setSoloPlayerAvatar(av)
+                s.toggleAvatarPicker(-1)
+              }}
+            />
+          )}
         </div>
       )}
 
@@ -250,23 +282,29 @@ export function LobbyScreen() {
           <input type="checkbox" checked={s.timerEnabled} onChange={s.toggleTimer} style={{ width: 18, height: 18 }} />
           {t('lobby.timerToggle')}
         </div>
-        <button
-          onClick={s.startGame}
-          disabled={cannotStart}
-          style={{
-            padding: 16,
-            borderRadius: 14,
-            border: 'none',
-            background: cannotStart ? theme.color.cardBorder : theme.color.accent,
-            color: cannotStart ? theme.color.textMuted : theme.color.white,
-            fontFamily: theme.font.heading,
-            fontWeight: 700,
-            fontSize: 17,
-            cursor: 'pointer',
-          }}
-        >
-          {t('lobby.start')}
-        </button>
+        {isGuest ? (
+          <div style={{ textAlign: 'center', fontSize: 13.5, color: theme.color.textMuted, padding: 8 }}>
+            {t('lobby.waitingForHost')}
+          </div>
+        ) : (
+          <button
+            onClick={s.startGame}
+            disabled={cannotStart}
+            style={{
+              padding: 16,
+              borderRadius: 14,
+              border: 'none',
+              background: cannotStart ? theme.color.cardBorder : theme.color.accent,
+              color: cannotStart ? theme.color.textMuted : theme.color.white,
+              fontFamily: theme.font.heading,
+              fontWeight: 700,
+              fontSize: 17,
+              cursor: 'pointer',
+            }}
+          >
+            {t('lobby.start')}
+          </button>
+        )}
       </div>
     </div>
   )

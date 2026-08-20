@@ -2,6 +2,8 @@ import { theme } from './ui/theme'
 import { useGameStore } from './ui/store'
 import { useIsDesktop } from './ui/hooks/useIsDesktop'
 import { ModeScreen } from './ui/screens/ModeScreen'
+import { OnlineChoiceScreen } from './ui/screens/OnlineChoiceScreen'
+import { JoinScreen } from './ui/screens/JoinScreen'
 import { LobbyScreen } from './ui/screens/LobbyScreen'
 import { BoardScreen } from './ui/screens/BoardScreen'
 import { PassScreen } from './ui/screens/PassScreen'
@@ -15,6 +17,10 @@ function CurrentScreen() {
   switch (screen) {
     case 'mode':
       return <ModeScreen />
+    case 'online-choice':
+      return <OnlineChoiceScreen />
+    case 'join':
+      return <JoinScreen />
     case 'lobby':
       return <LobbyScreen />
     case 'board':

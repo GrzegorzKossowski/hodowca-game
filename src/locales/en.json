@@ -47,8 +47,10 @@
     "addPlayer": "+ Add player (max {{max}})",
     "roomCode": "ROOM CODE",
     "roomCodeHint": "Share this code with the other players on the same network",
+    "connectedTo": "CONNECTED TO ROOM",
     "joined": "JOINED ({{count}}/{{max}})",
     "onlineWarning": "Connecting players requires internet, even if the game itself then runs over the local network.",
+    "waitingForHost": "Waiting for the host…",
     "botCount": "NUMBER OF BOTS: {{count}}",
     "botAggro": "BOT AGGRESSION",
     "aggro": {
@@ -60,12 +62,32 @@
     "timerToggle": "Turn time limit (60s)",
     "start": "Start game"
   },
+  "onlineChoice": {
+    "title": "Online / LAN game",
+    "yourName": "YOUR NAME",
+    "chooseAvatar": "Choose avatar",
+    "hostButton": "🏠 Host a game",
+    "hostDesc": "Create a room and share the code with other players.",
+    "joinButton": "🔗 Join a game",
+    "joinDesc": "Enter a room code from the player who's hosting."
+  },
+  "join": {
+    "title": "Join a game",
+    "back": "← Back",
+    "codeLabel": "ROOM CODE",
+    "codePlaceholder": "e.g. AB12CD",
+    "connect": "Connect",
+    "connecting": "Connecting…",
+    "errorCode": "Enter a valid room code.",
+    "errorTimeout": "Couldn't reach that room. Check the code and try again."
+  },
   "board": {
     "turnLabel": "turn",
     "rollDice": "🎲 Roll dice",
     "rolling": "Rolling…",
     "diceResult": "Result: {{a}} {{b}}",
     "diceHint": "Click to roll the dice",
+    "waitingFor": "Waiting for {{player}}'s turn…",
     "tabs": {
       "herd": "Herd",
       "trade": "Trade",

@@ -3,6 +3,7 @@ import { theme } from '../theme'
 import { useGameStore, type Tab } from '../store'
 import { ANIMAL_KEYS, HERD_EMOJI } from '../animals'
 import { TRADE_RECIPES, canAffordTrade, poolHasStock } from '../../engine'
+import { myPeerId } from '../../net/room'
 
 const TAB_ICONS: Record<Tab, string> = { herd: '🐄', trade: '🔄', rivals: '👥', log: '📜' }
 
@@ -12,7 +13,8 @@ export function BoardScreen() {
   const isDesktop = s.isDesktop
   const isMobile = !isDesktop
 
-  const activePlayer = s.players[s.currentPlayerIdx] ?? { name: '—', avatar: '🐻', herd: undefined }
+  const activePlayer = s.players[s.currentPlayerIdx] ?? { name: '—', avatar: '🐻', herd: undefined, peerId: undefined }
+  const isMyTurn = s.netRole === 'none' || activePlayer.peerId === myPeerId
   const rivals = s.players.filter((_, i) => i !== s.currentPlayerIdx)
   const rivalLimit = isDesktop ? 5 : 3
   const visibleRivals = rivals.slice(0, rivalLimit)
@@ -34,7 +36,7 @@ export function BoardScreen() {
       getKey,
       getCount: getCount ?? 0,
       affordable: activePlayer.herd
-        ? canAffordTrade(activePlayer.herd, recipe) && poolHasStock(s.mainPool, recipe)
+        ? isMyTurn && canAffordTrade(activePlayer.herd, recipe) && poolHasStock(s.mainPool, recipe)
         : false,
     }
   })
@@ -111,7 +113,7 @@ export function BoardScreen() {
         ))}
         <button
           onClick={s.rollDice}
-          disabled={s.diceRolling || s.hasRolledThisTurn}
+          disabled={s.diceRolling || s.hasRolledThisTurn || !isMyTurn}
           style={{
             alignSelf: 'center',
             padding: '14px 22px',
@@ -122,8 +124,8 @@ export function BoardScreen() {
             fontFamily: theme.font.heading,
             fontWeight: 700,
             fontSize: 15,
-            cursor: s.diceRolling || s.hasRolledThisTurn ? 'not-allowed' : 'pointer',
-            opacity: s.hasRolledThisTurn && !s.diceRolling ? 0.5 : 1,
+            cursor: s.diceRolling || s.hasRolledThisTurn || !isMyTurn ? 'not-allowed' : 'pointer',
+            opacity: (s.hasRolledThisTurn && !s.diceRolling) || !isMyTurn ? 0.5 : 1,
             minHeight: 48,
           }}
         >
@@ -131,7 +133,12 @@ export function BoardScreen() {
         </button>
       </div>
 
-      {diceResultText && (
+      {!isMyTurn && (
+        <div style={{ textAlign: 'center', fontSize: 13.5, color: theme.color.textMuted, padding: '8px 16px 0' }}>
+          {t('board.waitingFor', { player: activePlayer.name })}
+        </div>
+      )}
+      {isMyTurn && diceResultText && (
         <div style={{ textAlign: 'center', fontSize: 13.5, color: theme.color.textMuted, padding: '8px 16px 0' }}>{diceResultText}</div>
       )}
 
@@ -284,11 +291,11 @@ export function BoardScreen() {
         )}
       </div>
 
-      {s.mode === 'hotseat' && (
+      {(s.mode === 'hotseat' || s.mode === 'online') && (
         <div style={{ padding: 16, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button
             onClick={s.endTurn}
-            disabled={!s.hasRolledThisTurn}
+            disabled={!s.hasRolledThisTurn || !isMyTurn}
             style={{
               flex: 1,
               minWidth: 160,
@@ -299,8 +306,8 @@ export function BoardScreen() {
               color: theme.color.white,
               fontWeight: 700,
               fontSize: 13,
-              cursor: s.hasRolledThisTurn ? 'pointer' : 'not-allowed',
-              opacity: s.hasRolledThisTurn ? 1 : 0.5,
+              cursor: s.hasRolledThisTurn && isMyTurn ? 'pointer' : 'not-allowed',
+              opacity: s.hasRolledThisTurn && isMyTurn ? 1 : 0.5,
             }}
           >
             {t('board.endTurn')}

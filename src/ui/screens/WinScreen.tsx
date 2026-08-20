@@ -46,20 +46,24 @@ export function WinScreen() {
         ))}
       </div>
 
-      <div style={{ display: 'flex', gap: 12, marginTop: 12, width: '100%', maxWidth: 420 }}>
-        <button
-          onClick={s.playAgain}
-          style={{ flex: 1, padding: 15, borderRadius: 14, border: 'none', background: theme.color.accent, color: theme.color.white, fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
-        >
-          {t('win.playAgain')}
-        </button>
-        <button
-          onClick={s.backToMode}
-          style={{ flex: 1, padding: 15, borderRadius: 14, border: `1.5px solid ${theme.color.cardBorder}`, background: 'none', color: theme.color.text, fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
-        >
-          {t('win.backToMenu')}
-        </button>
-      </div>
+      {s.mode === 'online' && s.netRole === 'guest' ? (
+        <div style={{ fontSize: 13.5, color: theme.color.textMuted, marginTop: 12 }}>{t('lobby.waitingForHost')}</div>
+      ) : (
+        <div style={{ display: 'flex', gap: 12, marginTop: 12, width: '100%', maxWidth: 420 }}>
+          <button
+            onClick={s.playAgain}
+            style={{ flex: 1, padding: 15, borderRadius: 14, border: 'none', background: theme.color.accent, color: theme.color.white, fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
+          >
+            {t('win.playAgain')}
+          </button>
+          <button
+            onClick={s.backToMode}
+            style={{ flex: 1, padding: 15, borderRadius: 14, border: `1.5px solid ${theme.color.cardBorder}`, background: 'none', color: theme.color.text, fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
+          >
+            {t('win.backToMenu')}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
