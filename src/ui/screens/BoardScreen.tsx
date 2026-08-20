@@ -2,8 +2,9 @@ import { useTranslation } from 'react-i18next'
 import { theme } from '../theme'
 import { useGameStore, type Tab } from '../store'
 import { ANIMAL_KEYS, HERD_EMOJI } from '../animals'
-import { TRADE_RECIPES, canAffordTrade, poolHasStock } from '../../engine'
+import { TRADE_RECIPES, MAX_TRADES_PER_TURN, canAffordTrade, poolHasStock } from '../../engine'
 import { myPeerId } from '../../net/room'
+import { BotTurnBanner } from '../components/BotTurnBanner'
 
 const TAB_ICONS: Record<Tab, string> = { herd: '🐄', trade: '🔄', rivals: '👥', log: '📜' }
 
@@ -27,6 +28,7 @@ export function BoardScreen() {
   ]
   const mainPoolList = ANIMAL_KEYS.map((k) => ({ key: k, count: s.mainPool[k] }))
 
+  const tradesLeft = Math.max(0, MAX_TRADES_PER_TURN - s.tradesThisTurn)
   const tradeOptions = TRADE_RECIPES.map((recipe) => {
     const [giveKey, giveCount] = Object.entries(recipe.give)[0]
     const [getKey, getCount] = Object.entries(recipe.get)[0]
@@ -37,7 +39,7 @@ export function BoardScreen() {
       getKey,
       getCount: getCount ?? 0,
       affordable: activePlayer.herd
-        ? isMyTurn && canAffordTrade(activePlayer.herd, recipe) && poolHasStock(s.mainPool, recipe)
+        ? isMyTurn && tradesLeft > 0 && canAffordTrade(activePlayer.herd, recipe) && poolHasStock(s.mainPool, recipe)
         : false,
     }
   })
@@ -61,6 +63,7 @@ export function BoardScreen() {
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <BotTurnBanner />
       <div
         style={{
           display: 'flex',
@@ -197,7 +200,9 @@ export function BoardScreen() {
       >
         {showHerd && (
           <div style={{ background: theme.color.cardBg, borderRadius: isDesktop ? 18 : 0, border: isDesktop ? `1.5px solid ${theme.color.cardBorder}` : 'none', padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15 }}>{t('board.yourHerd')}</div>
+            <div style={{ fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15 }}>
+              {isMyTurn ? t('board.yourHerd') : t('board.theirHerd', { player: activePlayer.name })}
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
               {myHerd.map((a) => (
                 <div key={a.key} style={{ background: theme.color.bg, borderRadius: 14, padding: '12px 8px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
@@ -229,8 +234,35 @@ export function BoardScreen() {
         )}
 
         {showTrade && (
-          <div style={{ background: theme.color.cardBg, borderRadius: isDesktop ? 18 : 0, border: isDesktop ? `1.5px solid ${theme.color.cardBorder}` : 'none', padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15 }}>{t('board.trade.title')}</div>
+          <div
+            style={{
+              background: theme.color.cardBg,
+              borderRadius: isDesktop ? 18 : 0,
+              border: isDesktop ? `1.5px solid ${theme.color.cardBorder}` : 'none',
+              padding: 16,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+              opacity: isMyTurn ? 1 : 0.55,
+              pointerEvents: isMyTurn ? 'auto' : 'none',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15 }}>{t('board.trade.title')}</div>
+              <div
+                style={{
+                  marginLeft: 'auto',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: tradesLeft > 0 ? theme.color.textMuted : theme.color.danger,
+                  background: theme.color.bg,
+                  borderRadius: 999,
+                  padding: '4px 10px',
+                }}
+              >
+                {t('board.trade.left', { count: tradesLeft, max: MAX_TRADES_PER_TURN })}
+              </div>
+            </div>
             {tradeOptions.map((tr) => (
               <button
                 key={tr.id}

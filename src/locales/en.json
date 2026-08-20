@@ -83,6 +83,12 @@
   },
   "board": {
     "turnLabel": "turn",
+    "botTurn": {
+      "thinking": "is thinking…",
+      "rolling": "is rolling the dice…",
+      "trading": "is trading animals…",
+      "reacting": "is reacting to a predator…"
+    },
     "rollDice": "🎲 Roll dice",
     "rolling": "Rolling…",
     "diceResult": "Result: {{a}} {{b}}",
@@ -95,9 +101,11 @@
       "log": "Log"
     },
     "yourHerd": "Your herd",
+    "theirHerd": "{{player}}'s herd",
     "mainPool": "Main pool",
     "trade": {
-      "title": "Trade animals"
+      "title": "Trade animals",
+      "left": "{{count}}/{{max}} trades"
     },
     "rivals": "Rivals",
     "moreRivals": "+{{count}} more",

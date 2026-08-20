@@ -7,6 +7,7 @@ import {
   checkWin,
   isPredator,
   TRADE_RECIPES,
+  MAX_TRADES_PER_TURN,
   type DiceEvent,
   type TradeRecipe,
 } from '../engine'
@@ -63,6 +64,7 @@ interface GameStateSnapshot {
   diceResult: { a: string; b: string } | null
   overlay: PredatorOverlay | null
   hasRolledThisTurn: boolean
+  tradesThisTurn: number
   screen: Screen
 }
 
@@ -104,6 +106,7 @@ interface GameState {
   turnTimer: number
   pickingAvatarFor: number | null
   hasRolledThisTurn: boolean
+  tradesThisTurn: number
 
   netRole: NetRole
   hostPeerId: string | null
@@ -235,6 +238,7 @@ function snapshotOf(s: GameState): GameStateSnapshot {
     diceResult: s.diceResult,
     overlay: s.overlay,
     hasRolledThisTurn: s.hasRolledThisTurn,
+    tradesThisTurn: s.tradesThisTurn,
     screen: s.screen,
   }
 }
@@ -331,6 +335,7 @@ function promoteSelfToHost(get: () => GameState, set: (partial: Partial<GameStat
     players,
     currentPlayerIdx,
     hasRolledThisTurn: wasCurrentTurn ? false : s.hasRolledThisTurn,
+    tradesThisTurn: wasCurrentTurn ? 0 : s.tradesThisTurn,
     diceResult: wasCurrentTurn ? null : s.diceResult,
   })
   get().showToast('toast.becameHost')
@@ -379,6 +384,7 @@ function handlePeerLeave(get: () => GameState, set: (partial: Partial<GameState>
     players,
     currentPlayerIdx,
     hasRolledThisTurn: wasCurrentTurn ? false : s.hasRolledThisTurn,
+    tradesThisTurn: wasCurrentTurn ? 0 : s.tradesThisTurn,
     diceResult: wasCurrentTurn ? null : s.diceResult,
     log: [{ text: i18n.t('board.log.playerLeft', { player: left.name }), danger: true }, ...s.log],
   })
@@ -414,6 +420,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   turnTimer: 60,
   pickingAvatarFor: null,
   hasRolledThisTurn: false,
+  tradesThisTurn: 0,
 
   netRole: 'none',
   hostPeerId: null,
@@ -486,7 +493,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   startGame: () => {
     const s = get()
     if (s.netRole === 'guest') return
-    set({ screen: 'board', currentPlayerIdx: 0, hasRolledThisTurn: false, diceResult: null })
+    set({ screen: 'board', currentPlayerIdx: 0, hasRolledThisTurn: false, tradesThisTurn: 0, diceResult: null })
     if (s.netRole === 'host') broadcastState(get())
   },
 
@@ -542,9 +549,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       netCtx?.actAction.send({ type: 'trade', recipeId })
       return
     }
+    if (s.tradesThisTurn >= MAX_TRADES_PER_TURN) return
     const recipe = TRADE_RECIPES.find((r) => r.id === recipeId)
     if (!recipe) return
-    const { players, currentPlayerIdx, mainPool, log } = get()
+    const { players, currentPlayerIdx, mainPool, log, tradesThisTurn } = get()
     const activePlayer = players[currentPlayerIdx]
     const result = applyTrade(activePlayer.herd, mainPool, recipe)
     if (!result) return
@@ -556,6 +564,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       players: newPlayers,
       mainPool: result.pool,
       log: [tradeLogEntry(recipe, activePlayer.name), ...log],
+      tradesThisTurn: tradesThisTurn + 1,
       screen: won ? 'win' : get().screen,
     })
     if (get().netRole === 'host') broadcastState(get())
@@ -577,7 +586,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
     const next = (s.currentPlayerIdx + 1) % s.players.length
     const nextScreen: Screen = s.mode === 'online' || s.mode === 'bots' ? 'board' : 'pass'
-    set({ screen: nextScreen, currentPlayerIdx: next, turnTimer: 60, hasRolledThisTurn: false, diceResult: null })
+    set({ screen: nextScreen, currentPlayerIdx: next, turnTimer: 60, hasRolledThisTurn: false, tradesThisTurn: 0, diceResult: null })
     if (get().netRole === 'host') broadcastState(get())
   },
   confirmPass: () => set({ screen: 'board' }),
@@ -585,7 +594,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   playAgain: () => {
     const s = get()
     if (s.netRole === 'guest') return
-    set({ screen: 'board', currentPlayerIdx: 0, hasRolledThisTurn: false, diceResult: null })
+    set({ screen: 'board', currentPlayerIdx: 0, hasRolledThisTurn: false, tradesThisTurn: 0, diceResult: null })
     if (get().netRole === 'host') broadcastState(get())
   },
 
@@ -688,6 +697,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         diceResult: data.diceResult,
         overlay: data.overlay,
         hasRolledThisTurn: data.hasRolledThisTurn,
+        tradesThisTurn: data.tradesThisTurn,
         screen: data.screen,
         diceRolling: false,
       })

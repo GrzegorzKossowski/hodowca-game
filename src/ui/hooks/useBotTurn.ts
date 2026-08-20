@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useGameStore } from '../store'
-import { pickAllBotTrades, type BotAggro } from '../../engine'
+import { pickAllBotTrades, MAX_TRADES_PER_TURN, type BotAggro } from '../../engine'
 
 const ROLL_DELAY_MS = 700
 const OVERLAY_DELAY_MS = 1400
@@ -39,7 +39,7 @@ export function useBotTurn() {
       const s = useGameStore.getState()
       const me = s.players[s.currentPlayerIdx]
       if (!me) return
-      const [nextTrade] = pickAllBotTrades(me.herd, s.mainPool, s.botAggro as BotAggro)
+      const [nextTrade] = s.tradesThisTurn < MAX_TRADES_PER_TURN ? pickAllBotTrades(me.herd, s.mainPool, s.botAggro as BotAggro) : []
       if (nextTrade) s.makeTrade(nextTrade.id)
       else s.endTurn()
     }, TRADE_DELAY_MS)

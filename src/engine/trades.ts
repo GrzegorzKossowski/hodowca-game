@@ -6,6 +6,11 @@ export interface TradeRecipe {
   get: Partial<Record<HerdKey, number>>
 }
 
+/** How many successful trades with the main pool a player may make in a single turn. The tabletop
+ * rules cap this at 1; we allow a small chain instead so a turn doesn't require rolling again just
+ * to keep breeding up, while still keeping trading a scarce per-turn resource. */
+export const MAX_TRADES_PER_TURN = 3
+
 /** Breeding-up ladder plus dog exchanges. Only forward trades (toward rarer animals) are allowed. */
 export const TRADE_RECIPES: TradeRecipe[] = [
   { id: 'rabbit->sheep', give: { rabbit: 6 }, get: { sheep: 1 } },

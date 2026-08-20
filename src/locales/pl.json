@@ -85,6 +85,12 @@
   },
   "board": {
     "turnLabel": "tura",
+    "botTurn": {
+      "thinking": "myśli…",
+      "rolling": "rzuca kośćmi…",
+      "trading": "wymienia zwierzęta…",
+      "reacting": "reaguje na drapieżnika…"
+    },
     "rollDice": "🎲 Rzuć kośćmi",
     "rolling": "Rzucanie…",
     "diceResult": "Wynik: {{a}} {{b}}",
@@ -97,9 +103,11 @@
       "log": "Log"
     },
     "yourHerd": "Twoja hodowla",
+    "theirHerd": "Hodowla: {{player}}",
     "mainPool": "Stado główne",
     "trade": {
-      "title": "Wymiana zwierząt"
+      "title": "Wymiana zwierząt",
+      "left": "{{count}}/{{max}} wymian"
     },
     "rivals": "Rywale",
     "moreRivals": "+{{count}} więcej",
