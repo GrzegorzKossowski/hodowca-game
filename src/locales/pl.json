@@ -12,6 +12,10 @@
       "dogSmall": "Mały pies",
       "dogBig": "Duży pies"
     },
+    "predator": {
+      "fox": "Lis",
+      "wolf": "Wilk"
+    },
     "namePlaceholder": "Imię gracza"
   },
   "mode": {
@@ -73,18 +77,19 @@
     "yourHerd": "Twoja hodowla",
     "mainPool": "Stado główne",
     "trade": {
-      "title": "Wymiana zwierząt",
-      "rabbitToSheep": "króliki → owca",
-      "sheepToPig": "owce → świnia",
-      "pigToCow": "świnie → krowa",
-      "cowToHorse": "krowy → koń"
+      "title": "Wymiana zwierząt"
     },
     "rivals": "Rywale",
     "moreRivals": "+{{count}} więcej",
-    "log": "Historia tury",
-    "simulatePredator": "🦊 Symuluj drapieżnika",
-    "endTurn": "Zakończ turę →",
-    "simulateWin": "🏆 Symuluj zwycięstwo"
+    "logTitle": "Historia tury",
+    "log": {
+      "gain": "{{player}} otrzymuje: {{animal}}.",
+      "poolEmpty": "{{player}} rzucił {{animal}}, ale stado główne jest już puste.",
+      "predatorBlocked": "{{player}}: {{predator}} nadszedł, ale pies go odgonił!",
+      "predatorAttack": "Uwaga! {{player}} traci ze stada: {{lost}} (napadł {{predator}}).",
+      "trade": "{{player}} wymienia {{give}} na {{get}}."
+    },
+    "endTurn": "Zakończ turę →"
   },
   "pass": {
     "hint": "Przekaż urządzenie graczowi",

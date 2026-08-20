@@ -1,15 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import { theme } from '../theme'
 import { useGameStore, type Tab } from '../store'
-import { ANIMAL_KEYS, type AnimalKey } from '../animals'
+import { ANIMAL_KEYS, HERD_EMOJI } from '../animals'
+import { TRADE_RECIPES, canAffordTrade, poolHasStock } from '../../engine'
 
 const TAB_ICONS: Record<Tab, string> = { herd: '🐄', trade: '🔄', rivals: '👥', log: '📜' }
-const TRADE_NOTE_KEY: Record<number, string> = {
-  0: 'board.trade.rabbitToSheep',
-  1: 'board.trade.sheepToPig',
-  2: 'board.trade.pigToCow',
-  3: 'board.trade.cowToHorse',
-}
 
 export function BoardScreen() {
   const { t } = useTranslation()
@@ -29,12 +24,20 @@ export function BoardScreen() {
   ]
   const mainPoolList = ANIMAL_KEYS.map((k) => ({ key: k, count: s.mainPool[k] }))
 
-  const tradeOptions = [
-    { fromKey: 'rabbit' as AnimalKey, fromCount: 6, toKey: 'sheep' as AnimalKey, affordable: myHerd[0].count >= 6, noteKey: TRADE_NOTE_KEY[0] },
-    { fromKey: 'sheep' as AnimalKey, fromCount: 2, toKey: 'pig' as AnimalKey, affordable: myHerd[1].count >= 2, noteKey: TRADE_NOTE_KEY[1] },
-    { fromKey: 'pig' as AnimalKey, fromCount: 3, toKey: 'cow' as AnimalKey, affordable: myHerd[2].count >= 3, noteKey: TRADE_NOTE_KEY[2] },
-    { fromKey: 'cow' as AnimalKey, fromCount: 2, toKey: 'horse' as AnimalKey, affordable: myHerd[3].count >= 2, noteKey: TRADE_NOTE_KEY[3] },
-  ]
+  const tradeOptions = TRADE_RECIPES.map((recipe) => {
+    const [giveKey, giveCount] = Object.entries(recipe.give)[0]
+    const [getKey, getCount] = Object.entries(recipe.get)[0]
+    return {
+      id: recipe.id,
+      giveKey,
+      giveCount: giveCount ?? 0,
+      getKey,
+      getCount: getCount ?? 0,
+      affordable: activePlayer.herd
+        ? canAffordTrade(activePlayer.herd, recipe) && poolHasStock(s.mainPool, recipe)
+        : false,
+    }
+  })
 
   const tabs: Tab[] = ['herd', 'trade', 'rivals', 'log']
   const showHerd = isDesktop || s.activeTab === 'herd'
@@ -42,7 +45,7 @@ export function BoardScreen() {
   const showRivals = isDesktop || s.activeTab === 'rivals'
   const showLog = isDesktop || s.activeTab === 'log'
 
-  const emoji: Record<AnimalKey, string> = { rabbit: '🐰', sheep: '🐑', pig: '🐷', cow: '🐄', horse: '🐴' }
+  const emoji = HERD_EMOJI
 
   const diceFaces = s.diceResult
     ? [s.diceResult.a, s.diceResult.b]
@@ -108,8 +111,21 @@ export function BoardScreen() {
         ))}
         <button
           onClick={s.rollDice}
-          disabled={s.diceRolling}
-          style={{ alignSelf: 'center', padding: '14px 22px', borderRadius: 14, border: 'none', background: theme.color.accent, color: theme.color.white, fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15, cursor: 'pointer', minHeight: 48 }}
+          disabled={s.diceRolling || s.hasRolledThisTurn}
+          style={{
+            alignSelf: 'center',
+            padding: '14px 22px',
+            borderRadius: 14,
+            border: 'none',
+            background: theme.color.accent,
+            color: theme.color.white,
+            fontFamily: theme.font.heading,
+            fontWeight: 700,
+            fontSize: 15,
+            cursor: s.diceRolling || s.hasRolledThisTurn ? 'not-allowed' : 'pointer',
+            opacity: s.hasRolledThisTurn && !s.diceRolling ? 0.5 : 1,
+            minHeight: 48,
+          }}
         >
           {s.diceRolling ? t('board.rolling') : t('board.rollDice')}
         </button>
@@ -199,9 +215,9 @@ export function BoardScreen() {
             <div style={{ fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15 }}>{t('board.trade.title')}</div>
             {tradeOptions.map((tr) => (
               <button
-                key={tr.noteKey}
+                key={tr.id}
                 disabled={!tr.affordable}
-                onClick={() => s.showToast(tr.noteKey)}
+                onClick={() => s.makeTrade(tr.id)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -215,12 +231,14 @@ export function BoardScreen() {
                   minHeight: 52,
                 }}
               >
-                <span style={{ fontSize: 20 }}>{emoji[tr.fromKey]}</span>
-                <span style={{ fontWeight: 700, fontSize: 13 }}>×{tr.fromCount}</span>
+                <span style={{ fontSize: 20 }}>{emoji[tr.giveKey as keyof typeof emoji]}</span>
+                <span style={{ fontWeight: 700, fontSize: 13 }}>×{tr.giveCount}</span>
                 <span style={{ color: theme.color.textMuted }}>→</span>
-                <span style={{ fontSize: 20 }}>{emoji[tr.toKey]}</span>
-                <span style={{ fontWeight: 700, fontSize: 13 }}>×1</span>
-                <span style={{ marginLeft: 'auto', fontSize: 12, color: theme.color.textMuted }}>{t(tr.noteKey)}</span>
+                <span style={{ fontSize: 20 }}>{emoji[tr.getKey as keyof typeof emoji]}</span>
+                <span style={{ fontWeight: 700, fontSize: 13 }}>×{tr.getCount}</span>
+                <span style={{ marginLeft: 'auto', fontSize: 12, color: theme.color.textMuted }}>
+                  {t(`common.animal.${tr.giveKey}`)} → {t(`common.animal.${tr.getKey}`)}
+                </span>
               </button>
             ))}
           </div>
@@ -254,7 +272,7 @@ export function BoardScreen() {
 
             {showLog && (
               <div style={{ background: theme.color.cardBg, borderRadius: 18, border: `1.5px solid ${theme.color.cardBorder}`, padding: 14, display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 320, overflowY: 'auto' }}>
-                <div style={{ fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15 }}>{t('board.log')}</div>
+                <div style={{ fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15 }}>{t('board.logTitle')}</div>
                 {s.log.map((e, i) => (
                   <div key={i} style={{ fontSize: 13, lineHeight: 1.4, color: e.danger ? theme.color.danger : theme.color.text, paddingBottom: 8, borderBottom: `1px solid ${theme.color.divider}` }}>
                     {e.text}
@@ -266,28 +284,29 @@ export function BoardScreen() {
         )}
       </div>
 
-      <div style={{ padding: 16, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <button
-          onClick={s.simulatePredator}
-          style={{ flex: 1, minWidth: 160, padding: 12, borderRadius: 12, border: `1.5px solid ${theme.color.dangerBg}`, background: theme.color.dangerBgLight, color: theme.color.danger, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
-        >
-          {t('board.simulatePredator')}
-        </button>
-        {s.mode === 'hotseat' && (
+      {s.mode === 'hotseat' && (
+        <div style={{ padding: 16, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button
             onClick={s.endTurn}
-            style={{ flex: 1, minWidth: 160, padding: 12, borderRadius: 12, border: 'none', background: theme.color.accent, color: theme.color.white, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
+            disabled={!s.hasRolledThisTurn}
+            style={{
+              flex: 1,
+              minWidth: 160,
+              padding: 12,
+              borderRadius: 12,
+              border: 'none',
+              background: theme.color.accent,
+              color: theme.color.white,
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: s.hasRolledThisTurn ? 'pointer' : 'not-allowed',
+              opacity: s.hasRolledThisTurn ? 1 : 0.5,
+            }}
           >
             {t('board.endTurn')}
           </button>
-        )}
-        <button
-          onClick={s.simulateWin}
-          style={{ flex: 1, minWidth: 160, padding: 12, borderRadius: 12, border: `1.5px dashed ${theme.color.dashedBorder}`, background: 'none', color: theme.color.textMuted, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
-        >
-          {t('board.simulateWin')}
-        </button>
-      </div>
+        </div>
+      )}
     </div>
   )
 }

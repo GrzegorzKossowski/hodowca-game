@@ -1,6 +1,6 @@
 export { ANIMAL_KEYS, DOG_KEYS, makeHerd, herdTotal } from '../engine/animals'
 export type { AnimalKey, DogKey, HerdKey, Herd } from '../engine/animals'
-import type { AnimalKey } from '../engine/animals'
+import type { AnimalKey, HerdKey } from '../engine/animals'
 
 export const ANIMAL_EMOJI: Record<AnimalKey, string> = {
   rabbit: '🐰',
@@ -9,6 +9,14 @@ export const ANIMAL_EMOJI: Record<AnimalKey, string> = {
   cow: '🐄',
   horse: '🐴',
 }
+
+export const HERD_EMOJI: Record<HerdKey, string> = {
+  ...ANIMAL_EMOJI,
+  dogSmall: '🐕',
+  dogBig: '🐕‍🦺',
+}
+
+export const PREDATOR_EMOJI = { fox: '🦊', wolf: '🐺' } as const
 
 export const AVATARS = [
   '🐻', '🐨', '🐧', '🐢', '🐸', '🐶', '🐱', '🐭', '🐹',

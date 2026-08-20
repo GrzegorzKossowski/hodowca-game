@@ -12,6 +12,10 @@
       "dogSmall": "Small dog",
       "dogBig": "Big dog"
     },
+    "predator": {
+      "fox": "Fox",
+      "wolf": "Wolf"
+    },
     "namePlaceholder": "Player name"
   },
   "mode": {
@@ -71,18 +75,19 @@
     "yourHerd": "Your herd",
     "mainPool": "Main pool",
     "trade": {
-      "title": "Trade animals",
-      "rabbitToSheep": "rabbits → sheep",
-      "sheepToPig": "sheep → pig",
-      "pigToCow": "pigs → cow",
-      "cowToHorse": "cows → horse"
+      "title": "Trade animals"
     },
     "rivals": "Rivals",
     "moreRivals": "+{{count}} more",
-    "log": "Turn history",
-    "simulatePredator": "🦊 Simulate predator",
-    "endTurn": "End turn →",
-    "simulateWin": "🏆 Simulate win"
+    "logTitle": "Turn history",
+    "log": {
+      "gain": "{{player}} gains: {{animal}}.",
+      "poolEmpty": "{{player}} rolled {{animal}}, but the main pool is already empty.",
+      "predatorBlocked": "{{player}}: a {{predator}} showed up, but the dog chased it off!",
+      "predatorAttack": "Watch out! {{player}} loses from the herd: {{lost}} ({{predator}} attacked).",
+      "trade": "{{player}} trades {{give}} for {{get}}."
+    },
+    "endTurn": "End turn →"
   },
   "pass": {
     "hint": "Pass the device to",

@@ -1,5 +1,15 @@
 import { create } from 'zustand'
-import { AVATARS, NAME_POOL, makeHerd, type Herd } from './animals'
+import { AVATARS, NAME_POOL, makeHerd, HERD_EMOJI, PREDATOR_EMOJI, type Herd } from './animals'
+import i18n from '../i18n'
+import {
+  playTurn,
+  applyTrade,
+  checkWin,
+  isPredator,
+  TRADE_RECIPES,
+  type DiceEvent,
+  type TradeRecipe,
+} from '../engine'
 
 export type Screen = 'mode' | 'lobby' | 'board' | 'pass' | 'win'
 export type Mode = 'hotseat' | 'online' | 'bots' | null
@@ -46,6 +56,7 @@ interface GameState {
   rulesOpen: boolean
   turnTimer: number
   pickingAvatarFor: number | null
+  hasRolledThisTurn: boolean
 
   setIsDesktop: (v: boolean) => void
   selectMode: (mode: Exclude<Mode, null>) => void
@@ -61,11 +72,10 @@ interface GameState {
   toggleTimer: () => void
   startGame: () => void
   rollDice: () => void
-  simulatePredator: () => void
+  makeTrade: (recipeId: string) => void
   closeOverlay: () => void
   endTurn: () => void
   confirmPass: () => void
-  simulateWin: () => void
   playAgain: () => void
   backToMode: () => void
   openRules: () => void
@@ -89,6 +99,67 @@ function buildPlayers(n: number, botCount: number): Player[] {
   return players
 }
 
+function animalLabel(key: string, count: number): string {
+  return `${count}× ${i18n.t(`common.animal.${key}`)}`
+}
+
+function eventToLogEntry(event: DiceEvent, playerName: string): LogEntry {
+  switch (event.kind) {
+    case 'gain':
+      return {
+        text: i18n.t('board.log.gain', { player: playerName, animal: i18n.t(`common.animal.${event.animal}`) }),
+        danger: false,
+      }
+    case 'poolEmpty':
+      return {
+        text: i18n.t('board.log.poolEmpty', { player: playerName, animal: i18n.t(`common.animal.${event.animal}`) }),
+        danger: false,
+      }
+    case 'predatorBlocked':
+      return {
+        text: i18n.t('board.log.predatorBlocked', { player: playerName, predator: i18n.t(`common.predator.${event.predator}`) }),
+        danger: false,
+      }
+    case 'predatorAttack': {
+      const lost = Object.entries(event.lost)
+        .map(([k, v]) => animalLabel(k, v ?? 0))
+        .join(', ')
+      return {
+        text: i18n.t('board.log.predatorAttack', { player: playerName, predator: i18n.t(`common.predator.${event.predator}`), lost }),
+        danger: true,
+      }
+    }
+  }
+}
+
+function buildOverlay(event: Extract<DiceEvent, { kind: 'predatorAttack' | 'predatorBlocked' }>): PredatorOverlay {
+  const isFox = event.predator === 'fox'
+  if (event.kind === 'predatorBlocked') {
+    return {
+      emoji: PREDATOR_EMOJI[event.predator],
+      saved: true,
+      title: isFox ? 'overlay.foxSaved' : 'overlay.wolfSaved',
+      text: isFox ? 'overlay.foxSavedText' : 'overlay.wolfSavedText',
+    }
+  }
+  return {
+    emoji: PREDATOR_EMOJI[event.predator],
+    saved: false,
+    title: isFox ? 'overlay.foxAttack' : 'overlay.wolfAttack',
+    text: isFox ? 'overlay.foxAttackText' : 'overlay.wolfAttackText',
+  }
+}
+
+function tradeLogEntry(recipe: TradeRecipe, playerName: string): LogEntry {
+  const give = Object.entries(recipe.give)
+    .map(([k, v]) => animalLabel(k, v ?? 0))
+    .join(', ')
+  const get = Object.entries(recipe.get)
+    .map(([k, v]) => animalLabel(k, v ?? 0))
+    .join(', ')
+  return { text: i18n.t('board.log.trade', { player: playerName, give, get }), danger: false }
+}
+
 let toastTimer: ReturnType<typeof setTimeout> | undefined
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -106,16 +177,13 @@ export const useGameStore = create<GameState>((set, get) => ({
   diceRolling: false,
   diceResult: null,
   mainPool: makeHerd([54, 22, 18, 14, 9, 3, 1]),
-  log: [
-    { text: 'Ania rzuciła 2 świnie i otrzymała 1 świnię ze stada.', danger: false },
-    { text: 'Uwaga! Marek wyrzucił lisa i stracił 3 króliki.', danger: true },
-    { text: 'Zosia wymieniła 6 królików na 1 owcę.', danger: false },
-  ],
+  log: [],
   toast: null,
   overlay: null,
   rulesOpen: false,
   turnTimer: 60,
   pickingAvatarFor: null,
+  hasRolledThisTurn: false,
 
   setIsDesktop: (v) => set({ isDesktop: v }),
 
@@ -170,36 +238,59 @@ export const useGameStore = create<GameState>((set, get) => ({
   setSoloPlayerName: (v) => set({ soloPlayerName: v }),
   toggleTimer: () => set({ timerEnabled: !get().timerEnabled }),
 
-  startGame: () => set({ screen: 'board', currentPlayerIdx: 0 }),
+  startGame: () => set({ screen: 'board', currentPlayerIdx: 0, hasRolledThisTurn: false, diceResult: null }),
 
   rollDice: () => {
-    if (get().diceRolling) return
+    if (get().diceRolling || get().hasRolledThisTurn) return
     set({ diceRolling: true, diceResult: null })
     setTimeout(() => {
-      const faceSet = ['🐰', '🐑', '🐷', '🐄', '🐴', '🦊', '🐺']
-      const a = faceSet[Math.floor(Math.random() * 5)]
-      const b = faceSet[Math.floor(Math.random() * faceSet.length)]
-      set({ diceRolling: false, diceResult: { a, b } })
+      const { players, currentPlayerIdx, mainPool, log } = get()
+      const activePlayer = players[currentPlayerIdx]
+      const result = playTurn(activePlayer.herd, mainPool)
+
+      const diceResult = {
+        a: isPredator(result.roll.small) ? PREDATOR_EMOJI[result.roll.small] : HERD_EMOJI[result.roll.small],
+        b: isPredator(result.roll.big) ? PREDATOR_EMOJI[result.roll.big] : HERD_EMOJI[result.roll.big],
+      }
+
+      const newPlayers = players.map((p, i) => (i === currentPlayerIdx ? { ...p, herd: result.herd } : p))
+      const newLogEntries = result.events.map((e) => eventToLogEntry(e, activePlayer.name))
+      const predatorEvent = result.events.find(
+        (e): e is Extract<DiceEvent, { kind: 'predatorAttack' | 'predatorBlocked' }> =>
+          e.kind === 'predatorAttack' || e.kind === 'predatorBlocked',
+      )
+      const overlay = predatorEvent ? buildOverlay(predatorEvent) : null
+      const won = checkWin(result.herd)
+
+      set({
+        diceRolling: false,
+        diceResult,
+        players: newPlayers,
+        mainPool: result.pool,
+        log: [...newLogEntries, ...log],
+        hasRolledThisTurn: true,
+        overlay,
+        screen: won ? 'win' : get().screen,
+      })
     }, 900)
   },
 
-  simulatePredator: () => {
-    const isFox = Math.random() > 0.5
-    const saved = Math.random() > 0.5
+  makeTrade: (recipeId) => {
+    const recipe = TRADE_RECIPES.find((r) => r.id === recipeId)
+    if (!recipe) return
+    const { players, currentPlayerIdx, mainPool, log } = get()
+    const activePlayer = players[currentPlayerIdx]
+    const result = applyTrade(activePlayer.herd, mainPool, recipe)
+    if (!result) return
+
+    const newPlayers = players.map((p, i) => (i === currentPlayerIdx ? { ...p, herd: result.herd } : p))
+    const won = checkWin(result.herd)
+
     set({
-      overlay: saved
-        ? {
-            emoji: isFox ? '🦊' : '🐺',
-            saved: true,
-            title: isFox ? 'overlay.foxSaved' : 'overlay.wolfSaved',
-            text: isFox ? 'overlay.foxSavedText' : 'overlay.wolfSavedText',
-          }
-        : {
-            emoji: isFox ? '🦊' : '🐺',
-            saved: false,
-            title: isFox ? 'overlay.foxAttack' : 'overlay.wolfAttack',
-            text: isFox ? 'overlay.foxAttackText' : 'overlay.wolfAttackText',
-          },
+      players: newPlayers,
+      mainPool: result.pool,
+      log: [tradeLogEntry(recipe, activePlayer.name), ...log],
+      screen: won ? 'win' : get().screen,
     })
   },
 
@@ -211,12 +302,11 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   endTurn: () => {
     const next = (get().currentPlayerIdx + 1) % get().players.length
-    set({ screen: 'pass', currentPlayerIdx: next, turnTimer: 60 })
+    set({ screen: 'pass', currentPlayerIdx: next, turnTimer: 60, hasRolledThisTurn: false, diceResult: null })
   },
   confirmPass: () => set({ screen: 'board' }),
 
-  simulateWin: () => set({ screen: 'win' }),
-  playAgain: () => set({ screen: 'board', currentPlayerIdx: 0 }),
+  playAgain: () => set({ screen: 'board', currentPlayerIdx: 0, hasRolledThisTurn: false, diceResult: null }),
   backToMode: () => set({ screen: 'mode' }),
 
   openRules: () => set({ rulesOpen: true }),
