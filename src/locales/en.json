@@ -86,6 +86,10 @@
   },
   "board": {
     "turnLabel": "turn",
+    "yourTurnLabel": "👉 YOUR TURN",
+    "notYourTurn": "not your turn",
+    "turnChangeWait": "Wait for your turn…",
+    "nextStepHint": "You can now trade animals or end your turn.",
     "botTurn": {
       "thinking": "is thinking…",
       "rolling": "is rolling the dice…",

@@ -88,6 +88,10 @@
   },
   "board": {
     "turnLabel": "tura",
+    "yourTurnLabel": "👉 TWOJA TURA",
+    "notYourTurn": "nie Twoja tura",
+    "turnChangeWait": "Czekaj na swoją kolej…",
+    "nextStepHint": "Możesz teraz wymienić zwierzęta lub zakończyć turę.",
     "botTurn": {
       "thinking": "myśli…",
       "rolling": "rzuca kośćmi…",

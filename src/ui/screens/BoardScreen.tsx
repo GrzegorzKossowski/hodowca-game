@@ -3,7 +3,7 @@ import { theme } from '../theme'
 import { useGameStore, isLocalHumanTurn, type Tab } from '../store'
 import { ANIMAL_KEYS, HERD_EMOJI } from '../animals'
 import { TRADE_RECIPES, MAX_TRADES_PER_TURN, canAffordTrade, poolHasStock } from '../../engine'
-import { BotTurnBanner } from '../components/BotTurnBanner'
+import { TurnStatusBanner } from '../components/TurnStatusBanner'
 
 const TAB_ICONS: Record<Tab, string> = { herd: '🐄', trade: '🔄', rivals: '👥', log: '📜' }
 
@@ -61,7 +61,7 @@ export function BoardScreen() {
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-      <BotTurnBanner />
+      <TurnStatusBanner />
       <div
         style={{
           display: 'flex',
@@ -79,7 +79,9 @@ export function BoardScreen() {
           <span style={{ fontSize: 20 }}>{activePlayer.avatar}</span>
           <span style={{ fontFamily: theme.font.heading, fontWeight: 700, fontSize: 14, color: theme.color.accentDark }}>{activePlayer.name}</span>
         </div>
-        <div style={{ fontSize: 12.5, color: theme.color.textMuted }}>{t('board.turnLabel')}</div>
+        <div style={{ fontSize: 12.5, fontWeight: isMyTurn ? 800 : 400, color: isMyTurn ? theme.color.accent : theme.color.textMuted }}>
+          {isMyTurn ? t('board.yourTurnLabel') : t('board.turnLabel')}
+        </div>
         {s.timerEnabled && (
             <div
             style={{
@@ -162,9 +164,38 @@ export function BoardScreen() {
         </button>
       </div>
 
-      <div style={{ textAlign: 'center', fontSize: 13.5, color: theme.color.textMuted, padding: '8px 16px', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        {!isMyTurn ? t('board.waitingFor', { player: activePlayer.name }) : s.diceRolling ? t('board.rolling') : diceResultText}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          margin: '10px 16px',
+          padding: '12px 16px',
+          minHeight: 44,
+          borderRadius: 14,
+          textAlign: 'center',
+          fontWeight: 700,
+          fontSize: 15,
+          background: !isMyTurn ? theme.color.bg : s.hasRolledThisTurn ? theme.color.accentBg : theme.color.dangerBg,
+          color: !isMyTurn ? theme.color.textMuted : s.hasRolledThisTurn ? theme.color.accentDark : theme.color.danger,
+        }}
+      >
+        {!isMyTurn ? (
+          <>⏳ {t('board.waitingFor', { player: activePlayer.name })}</>
+        ) : s.diceRolling ? (
+          <>🎲 {t('board.rolling')}</>
+        ) : s.hasRolledThisTurn ? (
+          <>✅ {diceResultText}</>
+        ) : (
+          <>👉 {t('board.diceHint')}</>
+        )}
       </div>
+      {isMyTurn && s.hasRolledThisTurn && !s.overlay && (
+        <div style={{ textAlign: 'center', fontSize: 12.5, color: theme.color.textMuted, margin: '-4px 16px 6px' }}>
+          {t('board.nextStepHint')}
+        </div>
+      )}
 
       {isMobile && (
         <div style={{ display: 'flex', borderBottom: `1.5px solid ${theme.color.cardBorder}`, background: theme.color.cardBg }}>

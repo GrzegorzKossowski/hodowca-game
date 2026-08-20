@@ -13,6 +13,7 @@ import { WinScreen } from './ui/screens/WinScreen'
 import { RulesModal } from './ui/components/RulesModal'
 import { EventOverlay } from './ui/components/EventOverlay'
 import { Toast } from './ui/components/Toast'
+import { TurnChangeAnnouncement } from './ui/components/TurnChangeAnnouncement'
 
 function CurrentScreen() {
   const screen = useGameStore((s) => s.screen)
@@ -54,6 +55,7 @@ function App() {
       <CurrentScreen />
       <RulesModal />
       <EventOverlay />
+      <TurnChangeAnnouncement />
       <Toast />
     </div>
   )
