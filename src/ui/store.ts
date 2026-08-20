@@ -420,7 +420,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   currentPlayerIdx: 0,
   diceRolling: false,
   diceResult: null,
-  mainPool: makeHerd([54, 22, 18, 14, 9, 3, 1]),
+  mainPool: makeHerd([54, 22, 18, 14, 9, 4, 2]),
   log: [],
   toast: null,
   overlay: null,
