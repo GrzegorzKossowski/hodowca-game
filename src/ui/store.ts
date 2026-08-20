@@ -119,6 +119,7 @@ interface GameState {
   setIsDesktop: (v: boolean) => void
   selectMode: (mode: 'hotseat' | 'bots') => void
   addPlayer: () => void
+  addBotPlayer: () => void
   removePlayer: (id: number) => void
   toggleAvatarPicker: (id: number) => void
   selectAvatar: (id: number, avatar: string) => void
@@ -150,6 +151,13 @@ interface GameState {
   setJoinCode: (v: string) => void
   joinOnlineGame: () => void
   leaveOnlineGame: () => void
+}
+
+/** A fresh, collision-free id for a player being appended to an existing (possibly already
+ * trimmed-down, e.g. after a removal) roster — using array length here would risk reusing an id
+ * still held by another player. */
+function nextPlayerId(players: Player[]): number {
+  return players.reduce((max, p) => Math.max(max, p.id), -1) + 1
 }
 
 function buildPlayers(n: number, botCount: number): Player[] {
@@ -302,7 +310,7 @@ function attachHostHandlers(get: () => GameState, set: (partial: Partial<GameSta
         players: [
           ...s.players,
           {
-            id: s.players.length,
+            id: nextPlayerId(s.players),
             peerId: ctx.peerId,
             name: data.name,
             avatar: data.avatar,
@@ -444,14 +452,14 @@ export const useGameStore = create<GameState>((set, get) => ({
   addPlayer: () => {
     const players = get().players
     if (players.length >= 6) return
-    const i = players.length
+    const id = nextPlayerId(players)
     set({
       players: [
         ...players,
         {
-          id: i,
-          name: NAME_POOL[i] ?? `Gracz ${i + 1}`,
-          avatar: AVATARS[i % AVATARS.length],
+          id,
+          name: NAME_POOL[id] ?? `Gracz ${id + 1}`,
+          avatar: AVATARS[id % AVATARS.length],
           isBot: false,
           herd: makeHerd([6, 3, 1, 1, 0, 0, 0]),
         },
@@ -459,7 +467,34 @@ export const useGameStore = create<GameState>((set, get) => ({
     })
   },
 
-  removePlayer: (id) => set({ players: get().players.filter((p) => p.id !== id) }),
+  addBotPlayer: () => {
+    const s = get()
+    if (s.players.length >= 6) return
+    if (s.mode === 'online' && s.netRole !== 'host') return
+    const botNumber = s.players.filter((p) => p.isBot).length + 1
+    const id = nextPlayerId(s.players)
+    const bot: Player = {
+      id,
+      name: `Bot ${botNumber}`,
+      avatar: AVATARS[id % AVATARS.length],
+      isBot: true,
+      herd: makeHerd([6, 3, 1, 1, 0, 0, 0]),
+    }
+    const players = [...s.players, bot]
+    set({ players })
+    if (s.mode === 'online' && s.netRole === 'host') {
+      netCtx?.lobbyAction.send({ players, hostPeerId: myPeerId })
+    }
+  },
+
+  removePlayer: (id) => {
+    const s = get()
+    const players = s.players.filter((p) => p.id !== id)
+    set({ players })
+    if (s.mode === 'online' && s.netRole === 'host') {
+      netCtx?.lobbyAction.send({ players, hostPeerId: myPeerId })
+    }
+  },
 
   toggleAvatarPicker: (id) =>
     set({ pickingAvatarFor: get().pickingAvatarFor === id ? null : id }),
@@ -585,7 +620,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       return
     }
     const next = (s.currentPlayerIdx + 1) % s.players.length
-    const nextScreen: Screen = s.mode === 'online' || s.mode === 'bots' ? 'board' : 'pass'
+    const nextIsBot = !!s.players[next]?.isBot
+    const nextScreen: Screen = s.mode === 'online' || s.mode === 'bots' || nextIsBot ? 'board' : 'pass'
     set({ screen: nextScreen, currentPlayerIdx: next, turnTimer: 60, hasRolledThisTurn: false, tradesThisTurn: 0, diceResult: null })
     if (get().netRole === 'host') broadcastState(get())
   },

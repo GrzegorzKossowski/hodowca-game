@@ -45,6 +45,7 @@
     "players_one": "PLAYERS ({{count}})",
     "players_other": "PLAYERS ({{count}})",
     "addPlayer": "+ Add player (max {{max}})",
+    "addBot": "+ Add bot (max {{max}})",
     "roomCode": "ROOM CODE",
     "roomCodeHint": "Share this code with the other players on the same network",
     "connectedTo": "CONNECTED TO ROOM",

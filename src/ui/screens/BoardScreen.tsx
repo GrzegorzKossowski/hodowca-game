@@ -14,9 +14,8 @@ export function BoardScreen() {
   const isDesktop = s.isDesktop
   const isMobile = !isDesktop
 
-  const activePlayer = s.players[s.currentPlayerIdx] ?? { name: '—', avatar: '🐻', herd: undefined, peerId: undefined }
-  const isMyTurn =
-    s.mode === 'online' ? activePlayer.peerId === myPeerId : s.mode === 'bots' ? !activePlayer.isBot : true
+  const activePlayer = s.players[s.currentPlayerIdx] ?? { name: '—', avatar: '🐻', herd: undefined, peerId: undefined, isBot: false }
+  const isMyTurn = activePlayer.isBot ? false : s.mode === 'online' ? activePlayer.peerId === myPeerId : true
   const rivals = s.players.filter((_, i) => i !== s.currentPlayerIdx)
   const rivalLimit = isDesktop ? 5 : 3
   const visibleRivals = rivals.slice(0, rivalLimit)

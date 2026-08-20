@@ -5,7 +5,6 @@ import { useGameStore } from '../store'
 export function BotTurnBanner() {
   const { t } = useTranslation()
   const screen = useGameStore((s) => s.screen)
-  const mode = useGameStore((s) => s.mode)
   const currentPlayerIdx = useGameStore((s) => s.currentPlayerIdx)
   const players = useGameStore((s) => s.players)
   const diceRolling = useGameStore((s) => s.diceRolling)
@@ -13,7 +12,7 @@ export function BotTurnBanner() {
   const overlay = useGameStore((s) => s.overlay)
 
   const active = players[currentPlayerIdx]
-  const isBotTurn = screen === 'board' && mode === 'bots' && !!active?.isBot
+  const isBotTurn = screen === 'board' && !!active?.isBot
   if (!isBotTurn) return null
 
   const phase = overlay

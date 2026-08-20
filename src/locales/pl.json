@@ -47,6 +47,7 @@
     "players_many": "GRACZE ({{count}})",
     "players_other": "GRACZE ({{count}})",
     "addPlayer": "+ Dodaj gracza (max {{max}})",
+    "addBot": "+ Dodaj bota (max {{max}})",
     "roomCode": "KOD POKOJU",
     "roomCodeHint": "Podaj ten kod pozostałym graczom w tej samej sieci",
     "connectedTo": "POŁĄCZONO Z POKOJEM",

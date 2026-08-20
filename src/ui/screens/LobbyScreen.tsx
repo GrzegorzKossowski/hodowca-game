@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { theme } from '../theme'
 import { useGameStore } from '../store'
 import { AvatarPicker } from '../components/AvatarPicker'
+import { BotAggroControl } from '../components/BotAggroControl'
 
 export function LobbyScreen() {
   const { t } = useTranslation()
@@ -59,20 +60,27 @@ export function LobbyScreen() {
                   padding: '10px 12px',
                 }}
               >
-                <button
-                  onClick={() => s.toggleAvatarPicker(p.id)}
-                  style={{
-                    fontSize: 24,
-                    background: theme.color.accentBg,
-                    border: 'none',
-                    borderRadius: 10,
-                    width: 44,
-                    height: 44,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {p.avatar}
-                </button>
+                <div style={{ position: 'relative' }}>
+                  <button
+                    onClick={() => s.toggleAvatarPicker(p.id)}
+                    style={{
+                      fontSize: 24,
+                      background: theme.color.accentBg,
+                      border: 'none',
+                      borderRadius: 10,
+                      width: 44,
+                      height: 44,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {p.avatar}
+                  </button>
+                  {p.isBot && (
+                    <span style={{ position: 'absolute', bottom: -4, right: -4, fontSize: 14, background: theme.color.cardBg, borderRadius: '50%', lineHeight: 1 }}>
+                      🤖
+                    </span>
+                  )}
+                </div>
                 <input
                   value={p.name}
                   onChange={(e) => s.renamePlayer(p.id, e.target.value)}
@@ -101,22 +109,41 @@ export function LobbyScreen() {
               )}
             </div>
           ))}
-          <button
-            onClick={s.addPlayer}
-            disabled={s.players.length >= 6}
-            style={{
-              flex: 1,
-              padding: 12,
-              borderRadius: 12,
-              border: `1.5px dashed ${theme.color.dashedBorder}`,
-              background: 'transparent',
-              color: theme.color.textMuted,
-              cursor: 'pointer',
-              fontSize: 14,
-            }}
-          >
-            {t('lobby.addPlayer', { max: 6 })}
-          </button>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={s.addPlayer}
+              disabled={s.players.length >= 6}
+              style={{
+                flex: 1,
+                padding: 12,
+                borderRadius: 12,
+                border: `1.5px dashed ${theme.color.dashedBorder}`,
+                background: 'transparent',
+                color: theme.color.textMuted,
+                cursor: 'pointer',
+                fontSize: 14,
+              }}
+            >
+              {t('lobby.addPlayer', { max: 6 })}
+            </button>
+            <button
+              onClick={s.addBotPlayer}
+              disabled={s.players.length >= 6}
+              style={{
+                flex: 1,
+                padding: 12,
+                borderRadius: 12,
+                border: `1.5px dashed ${theme.color.dashedBorder}`,
+                background: 'transparent',
+                color: theme.color.textMuted,
+                cursor: 'pointer',
+                fontSize: 14,
+              }}
+            >
+              {t('lobby.addBot', { max: 6 })}
+            </button>
+          </div>
+          {s.players.some((p) => p.isBot) && <BotAggroControl />}
         </div>
       )}
 
@@ -161,10 +188,42 @@ export function LobbyScreen() {
               >
                 <span style={{ fontSize: 22 }}>{p.avatar}</span>
                 <span style={{ flex: 1, fontWeight: 600 }}>{p.name}</span>
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: theme.color.accent }} />
+                {p.isBot ? (
+                  <>
+                    <span style={{ fontSize: 16 }}>🤖</span>
+                    {s.netRole === 'host' && (
+                      <button
+                        onClick={() => s.removePlayer(p.id)}
+                        style={{ background: 'none', border: 'none', color: theme.color.danger, fontSize: 18, cursor: 'pointer', padding: 6 }}
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: theme.color.accent }} />
+                )}
               </div>
             ))}
           </div>
+          {s.netRole === 'host' && (
+            <button
+              onClick={s.addBotPlayer}
+              disabled={s.players.length >= 6}
+              style={{
+                padding: 12,
+                borderRadius: 12,
+                border: `1.5px dashed ${theme.color.dashedBorder}`,
+                background: 'transparent',
+                color: theme.color.textMuted,
+                cursor: 'pointer',
+                fontSize: 14,
+              }}
+            >
+              {t('lobby.addBot', { max: 6 })}
+            </button>
+          )}
+          {s.players.some((p) => p.isBot) && <BotAggroControl />}
           <div
             style={{
               fontSize: 12.5,
@@ -209,30 +268,7 @@ export function LobbyScreen() {
               </button>
             </div>
           </div>
-          <div>
-            <div style={{ fontSize: 13, color: theme.color.textMuted, fontWeight: 600, marginBottom: 8 }}>{t('lobby.botAggro')}</div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {[t('lobby.aggro.easy'), t('lobby.aggro.medium'), t('lobby.aggro.hard')].map((label, i) => (
-                <button
-                  key={label}
-                  onClick={() => s.setBotAggro(i)}
-                  style={{
-                    flex: 1,
-                    padding: 10,
-                    borderRadius: 12,
-                    cursor: 'pointer',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    border: `1.5px solid ${s.botAggro === i ? theme.color.accent : theme.color.cardBorder}`,
-                    background: s.botAggro === i ? theme.color.accentBg : theme.color.cardBg,
-                    color: s.botAggro === i ? theme.color.accentDark : theme.color.text,
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <BotAggroControl />
           <div style={{ fontSize: 13, color: theme.color.textMuted, fontWeight: 600 }}>{t('lobby.yourName')}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <button
