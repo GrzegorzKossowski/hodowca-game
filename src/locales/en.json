@@ -86,6 +86,7 @@
   },
   "board": {
     "turnLabel": "turn",
+    "youLabel": "YOU",
     "yourTurnLabel": "👉 YOUR TURN",
     "notYourTurn": "not your turn",
     "turnChangeWait": "Wait for your turn…",

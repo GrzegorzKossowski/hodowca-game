@@ -4,6 +4,7 @@ import { useGameStore, isLocalHumanTurn, type Tab } from '../store'
 import { ANIMAL_KEYS, HERD_EMOJI } from '../animals'
 import { TRADE_RECIPES, MAX_TRADES_PER_TURN, canAffordTrade, poolHasStock } from '../../engine'
 import { TurnStatusBanner } from '../components/TurnStatusBanner'
+import { myPeerId } from '../../net/room'
 
 const TAB_ICONS: Record<Tab, string> = { herd: '🐄', trade: '🔄', rivals: '👥', log: '📜' }
 
@@ -15,6 +16,16 @@ export function BoardScreen() {
 
   const activePlayer = s.players[s.currentPlayerIdx] ?? { name: '—', avatar: '🐻', herd: undefined, peerId: undefined, isBot: false }
   const isMyTurn = isLocalHumanTurn(s)
+  // Whose screen this actually is — in hotseat mode the device rotates between players, so whoever's
+  // turn it is IS the screen holder; in online/bots mode it's always the same one fixed local player,
+  // shown regardless of whose turn it currently is (three phones/tabs side by side must be tellable
+  // apart even when none of them is the active player).
+  const myIdentity =
+    s.mode === 'online'
+      ? (s.players.find((p) => p.peerId === myPeerId) ?? activePlayer)
+      : s.mode === 'bots'
+        ? (s.players.find((p) => !p.isBot) ?? activePlayer)
+        : activePlayer
   const rivals = s.players.filter((_, i) => i !== s.currentPlayerIdx)
   const rivalLimit = isDesktop ? 5 : 3
   const visibleRivals = rivals.slice(0, rivalLimit)
@@ -76,12 +87,21 @@ export function BoardScreen() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: theme.color.accentBg, borderRadius: 999, padding: '6px 12px 6px 6px' }}>
-          <span style={{ fontSize: 20 }}>{activePlayer.avatar}</span>
-          <span style={{ fontFamily: theme.font.heading, fontWeight: 700, fontSize: 14, color: theme.color.accentDark }}>{activePlayer.name}</span>
+          <span style={{ fontSize: 20 }}>{myIdentity.avatar}</span>
+          <span style={{ fontFamily: theme.font.heading, fontWeight: 700, fontSize: 14, color: theme.color.accentDark }}>{myIdentity.name}</span>
+          {!isMyTurn && (
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: theme.color.textMuted, letterSpacing: '0.04em' }}>{t('board.youLabel')}</span>
+          )}
         </div>
-        <div style={{ fontSize: 12.5, fontWeight: isMyTurn ? 800 : 400, color: isMyTurn ? theme.color.accent : theme.color.textMuted }}>
-          {isMyTurn ? t('board.yourTurnLabel') : t('board.turnLabel')}
-        </div>
+        {isMyTurn ? (
+          <div style={{ fontSize: 12.5, fontWeight: 800, color: theme.color.accent }}>{t('board.yourTurnLabel')}</div>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: theme.color.textMuted }}>
+            <span>{t('board.turnLabel')}:</span>
+            <span style={{ fontSize: 15 }}>{activePlayer.avatar}</span>
+            <span style={{ fontWeight: 600 }}>{activePlayer.name}</span>
+          </div>
+        )}
         {s.timerEnabled && (
             <div
             style={{

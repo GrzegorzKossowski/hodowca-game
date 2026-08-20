@@ -88,6 +88,7 @@
   },
   "board": {
     "turnLabel": "tura",
+    "youLabel": "TY",
     "yourTurnLabel": "👉 TWOJA TURA",
     "notYourTurn": "nie Twoja tura",
     "turnChangeWait": "Czekaj na swoją kolej…",
