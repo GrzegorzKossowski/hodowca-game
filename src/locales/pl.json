@@ -109,7 +109,8 @@
       "poolEmpty": "{{player}} rzucił {{animal}}, ale stado główne jest już puste.",
       "predatorBlocked": "{{player}}: {{predator}} nadszedł, ale pies go odgonił!",
       "predatorAttack": "Uwaga! {{player}} traci ze stada: {{lost}} (napadł {{predator}}).",
-      "trade": "{{player}} wymienia {{give}} na {{get}}."
+      "trade": "{{player}} wymienia {{give}} na {{get}}.",
+      "playerLeft": "{{player}} rozłączył(a) się z gry."
     },
     "endTurn": "Zakończ turę →"
   },
@@ -139,7 +140,9 @@
   },
   "toast": {
     "herdSafe": "Stado bezpieczne 🐕",
-    "herdLost": "Zwierzęta stracone 😬"
+    "herdLost": "Zwierzęta stracone 😬",
+    "becameHost": "Host rozłączony — przejmujesz rolę hosta",
+    "gameStalled": "Wszyscy pozostali gracze się rozłączyli"
   },
   "rules": {
     "title": "📖 Zasady i przeliczniki",

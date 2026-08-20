@@ -56,6 +56,7 @@ interface GameActionPayload {
 
 interface GameStateSnapshot {
   players: Player[]
+  hostPeerId: string
   mainPool: Herd
   log: LogEntry[]
   currentPlayerIdx: number
@@ -227,6 +228,7 @@ function tradeLogEntry(recipe: TradeRecipe, playerName: string): LogEntry {
 function snapshotOf(s: GameState): GameStateSnapshot {
   return {
     players: s.players,
+    hostPeerId: s.hostPeerId ?? myPeerId,
     mainPool: s.mainPool,
     log: s.log,
     currentPlayerIdx: s.currentPlayerIdx,
@@ -235,6 +237,152 @@ function snapshotOf(s: GameState): GameStateSnapshot {
     hasRolledThisTurn: s.hasRolledThisTurn,
     screen: s.screen,
   }
+}
+
+/** Removes a departed player and keeps currentPlayerIdx pointing at a valid player,
+ * advancing the turn if it was the departed player's turn. */
+export function removePlayerAndFixTurn(
+  players: Player[],
+  currentPlayerIdx: number,
+  leftPeerId: string,
+): { players: Player[]; currentPlayerIdx: number; wasCurrentTurn: boolean } {
+  const leftIdx = players.findIndex((p) => p.peerId === leftPeerId)
+  if (leftIdx === -1) {
+    return { players, currentPlayerIdx, wasCurrentTurn: false }
+  }
+  const newPlayers = players.filter((p) => p.peerId !== leftPeerId)
+  if (newPlayers.length === 0) {
+    return { players: newPlayers, currentPlayerIdx: 0, wasCurrentTurn: leftIdx === currentPlayerIdx }
+  }
+  let newIdx = currentPlayerIdx
+  if (leftIdx < currentPlayerIdx) newIdx -= 1
+  else if (leftIdx === currentPlayerIdx) newIdx = currentPlayerIdx
+  newIdx = ((newIdx % newPlayers.length) + newPlayers.length) % newPlayers.length
+  return { players: newPlayers, currentPlayerIdx: newIdx, wasCurrentTurn: leftIdx === currentPlayerIdx }
+}
+
+/** Deterministic pick of who takes over as host among the remaining players — lowest player id wins,
+ * so every peer computes the same winner independently without negotiation. */
+export function electNewHost(players: Player[]): Player | null {
+  const candidates = players.filter((p) => p.peerId).sort((a, b) => a.id - b.id)
+  return candidates[0] ?? null
+}
+
+function createNetActions(room: Room): NetContext {
+  const joinAction = room.makeAction('join') as unknown as NetAction<JoinPayload>
+  const lobbyAction = room.makeAction('lobby') as unknown as NetAction<LobbySnapshot>
+  const actAction = room.makeAction('act') as unknown as NetAction<GameActionPayload>
+  const syncAction = room.makeAction('sync') as unknown as NetAction<GameStateSnapshot>
+  return { room, joinAction, lobbyAction, actAction, syncAction }
+}
+
+/** Wires up the host-only message handlers (join requests, action requests from guests) on the
+ * current netCtx. Used both when first hosting and when a guest is promoted after host failover. */
+function attachHostHandlers(get: () => GameState, set: (partial: Partial<GameState>) => void) {
+  if (!netCtx) return
+  const { joinAction, actAction } = netCtx
+
+  const broadcastLobby = () => {
+    const s = get()
+    netCtx?.lobbyAction.send({ players: s.players, hostPeerId: myPeerId })
+  }
+
+  joinAction.onMessage = (data, ctx) => {
+    const s = get()
+    const existing = s.players.find((p) => p.peerId === ctx.peerId)
+    if (existing) {
+      set({ players: s.players.map((p) => (p.peerId === ctx.peerId ? { ...p, name: data.name, avatar: data.avatar } : p)) })
+    } else {
+      if (s.players.length >= 6) return
+      set({
+        players: [
+          ...s.players,
+          {
+            id: s.players.length,
+            peerId: ctx.peerId,
+            name: data.name,
+            avatar: data.avatar,
+            isBot: false,
+            herd: makeHerd([6, 3, 1, 1, 0, 0, 0]),
+          },
+        ],
+      })
+    }
+    broadcastLobby()
+  }
+
+  actAction.onMessage = (data, ctx) => {
+    const s = get()
+    const activePlayer = s.players[s.currentPlayerIdx]
+    if (!activePlayer || activePlayer.peerId !== ctx.peerId) return
+    if (data.type === 'roll') get().rollDice()
+    else if (data.type === 'trade' && data.recipeId) get().makeTrade(data.recipeId)
+    else if (data.type === 'endTurn') get().endTurn()
+  }
+}
+
+function promoteSelfToHost(get: () => GameState, set: (partial: Partial<GameState>) => void, leftHostPeerId: string) {
+  attachHostHandlers(get, set)
+  const s = get()
+  const { players, currentPlayerIdx, wasCurrentTurn } = removePlayerAndFixTurn(s.players, s.currentPlayerIdx, leftHostPeerId)
+  set({
+    netRole: 'host',
+    hostPeerId: myPeerId,
+    players,
+    currentPlayerIdx,
+    hasRolledThisTurn: wasCurrentTurn ? false : s.hasRolledThisTurn,
+    diceResult: wasCurrentTurn ? null : s.diceResult,
+  })
+  get().showToast('toast.becameHost')
+  broadcastState(get())
+}
+
+/** Shared onPeerLeave handler for both host and guests — detects a departed player, and if it was
+ * the host, deterministically elects a replacement (host failover, M4). */
+function handlePeerLeave(get: () => GameState, set: (partial: Partial<GameState>) => void, peerId: string) {
+  const s = get()
+  const left = s.players.find((p) => p.peerId === peerId)
+  if (!left) return
+
+  if (s.screen === 'lobby') {
+    if (s.netRole !== 'host') return
+    const players = s.players.filter((p) => p.peerId !== peerId)
+    set({ players })
+    netCtx?.lobbyAction.send({ players, hostPeerId: myPeerId })
+    return
+  }
+
+  const wasHost = s.hostPeerId === peerId
+
+  if (wasHost) {
+    const remaining = s.players.filter((p) => p.peerId !== peerId)
+    const newHost = electNewHost(remaining)
+    if (!newHost) {
+      set({ players: remaining })
+      get().showToast('toast.gameStalled')
+      return
+    }
+    if (newHost.peerId === myPeerId) {
+      promoteSelfToHost(get, set, peerId)
+    } else {
+      set({ players: remaining, hostPeerId: newHost.peerId })
+    }
+    return
+  }
+
+  if (s.netRole !== 'host') {
+    set({ players: s.players.filter((p) => p.peerId !== peerId) })
+    return
+  }
+  const { players, currentPlayerIdx, wasCurrentTurn } = removePlayerAndFixTurn(s.players, s.currentPlayerIdx, peerId)
+  set({
+    players,
+    currentPlayerIdx,
+    hasRolledThisTurn: wasCurrentTurn ? false : s.hasRolledThisTurn,
+    diceResult: wasCurrentTurn ? null : s.diceResult,
+    log: [{ text: i18n.t('board.log.playerLeft', { player: left.name }), danger: true }, ...s.log],
+  })
+  broadcastState(get())
 }
 
 function broadcastState(s: GameState) {
@@ -477,57 +625,9 @@ export const useGameStore = create<GameState>((set, get) => ({
       herd: makeHerd([4, 2, 1, 0, 0, 1, 0]),
     }
 
-    const joinAction = room.makeAction('join') as unknown as NetAction<JoinPayload>
-    const lobbyAction = room.makeAction('lobby') as unknown as NetAction<LobbySnapshot>
-    const actAction = room.makeAction('act') as unknown as NetAction<GameActionPayload>
-    const syncAction = room.makeAction('sync') as unknown as NetAction<GameStateSnapshot>
-    netCtx = { room, joinAction, lobbyAction, actAction, syncAction }
-
-    const broadcastLobby = () => {
-      const s = get()
-      lobbyAction.send({ players: s.players, hostPeerId: myPeerId })
-    }
-
-    joinAction.onMessage = (data, ctx) => {
-      const s = get()
-      const existing = s.players.find((p) => p.peerId === ctx.peerId)
-      if (existing) {
-        set({ players: s.players.map((p) => (p.peerId === ctx.peerId ? { ...p, name: data.name, avatar: data.avatar } : p)) })
-      } else {
-        if (s.players.length >= 6) return
-        set({
-          players: [
-            ...s.players,
-            {
-              id: s.players.length,
-              peerId: ctx.peerId,
-              name: data.name,
-              avatar: data.avatar,
-              isBot: false,
-              herd: makeHerd([6, 3, 1, 1, 0, 0, 0]),
-            },
-          ],
-        })
-      }
-      broadcastLobby()
-    }
-
-    actAction.onMessage = (data, ctx) => {
-      const s = get()
-      const activePlayer = s.players[s.currentPlayerIdx]
-      if (!activePlayer || activePlayer.peerId !== ctx.peerId) return
-      if (data.type === 'roll') get().rollDice()
-      else if (data.type === 'trade' && data.recipeId) get().makeTrade(data.recipeId)
-      else if (data.type === 'endTurn') get().endTurn()
-    }
-
-    room.onPeerLeave = (peerId) => {
-      const s = get()
-      if (s.screen !== 'lobby') return
-      if (!s.players.some((p) => p.peerId === peerId)) return
-      set({ players: s.players.filter((p) => p.peerId !== peerId) })
-      broadcastLobby()
-    }
+    netCtx = createNetActions(room)
+    attachHostHandlers(get, set)
+    room.onPeerLeave = (peerId) => handlePeerLeave(get, set, peerId)
 
     set({
       mode: 'online',
@@ -553,11 +653,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ connecting: true, joinError: null })
 
     const room = openRoom(code)
-    const joinAction = room.makeAction('join') as unknown as NetAction<JoinPayload>
-    const lobbyAction = room.makeAction('lobby') as unknown as NetAction<LobbySnapshot>
-    const actAction = room.makeAction('act') as unknown as NetAction<GameActionPayload>
-    const syncAction = room.makeAction('sync') as unknown as NetAction<GameStateSnapshot>
-    netCtx = { room, joinAction, lobbyAction, actAction, syncAction }
+    netCtx = createNetActions(room)
+    const { joinAction, lobbyAction, syncAction } = netCtx
 
     let gotLobby = false
     const timeout = setTimeout(() => {
@@ -584,6 +681,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     syncAction.onMessage = (data) => {
       set({
         players: data.players,
+        hostPeerId: data.hostPeerId,
         mainPool: data.mainPool,
         log: data.log,
         currentPlayerIdx: data.currentPlayerIdx,
@@ -596,8 +694,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     room.onPeerJoin = () => {
-      joinAction.send({ name, avatar })
+      if (get().netRole === 'guest') joinAction.send({ name, avatar })
     }
+
+    room.onPeerLeave = (peerId) => handlePeerLeave(get, set, peerId)
 
     set({ mode: 'online', netRole: 'guest', roomCode: code })
     joinAction.send({ name, avatar })

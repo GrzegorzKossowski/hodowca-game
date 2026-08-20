@@ -107,7 +107,8 @@
       "poolEmpty": "{{player}} rolled {{animal}}, but the main pool is already empty.",
       "predatorBlocked": "{{player}}: a {{predator}} showed up, but the dog chased it off!",
       "predatorAttack": "Watch out! {{player}} loses from the herd: {{lost}} ({{predator}} attacked).",
-      "trade": "{{player}} trades {{give}} for {{get}}."
+      "trade": "{{player}} trades {{give}} for {{get}}.",
+      "playerLeft": "{{player}} disconnected from the game."
     },
     "endTurn": "End turn →"
   },
@@ -137,7 +138,9 @@
   },
   "toast": {
     "herdSafe": "Herd safe 🐕",
-    "herdLost": "Animals lost 😬"
+    "herdLost": "Animals lost 😬",
+    "becameHost": "Host disconnected — you're now the host",
+    "gameStalled": "All other players have disconnected"
   },
   "rules": {
     "title": "📖 Rules and exchange rates",
