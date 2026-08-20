@@ -21,6 +21,7 @@
   "mode": {
     "subtitle": "Wybierz sposób gry",
     "rulesLink": "📖 Zasady i przeliczniki",
+    "disclaimer": "Hodowca to niekomercyjny, fanowski projekt inspirowany klasyczną mechaniką gier o hodowaniu i wymianie zwierząt. Nie jest powiązany z żadnym wydawcą ani właścicielem praw do oryginalnej gry i nie ma na celu naruszania niczyich znaków towarowych ani własności intelektualnej. To eksperymentalny projekt „vibe coding” zrealizowany przy pomocy Claude Code (Anthropic).",
     "hotseat": {
       "title": "Hot seat",
       "desc": "Gracie przy jednym ekranie, na zmianę podając urządzenie."

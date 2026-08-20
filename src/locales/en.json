@@ -21,6 +21,7 @@
   "mode": {
     "subtitle": "Choose how to play",
     "rulesLink": "📖 Rules and exchange rates",
+    "disclaimer": "Hodowca is a non-commercial fan project inspired by the classic animal-breeding and trading dice-game mechanic. It is not affiliated with any publisher or rights holder of the original game and is not intended to infringe on anyone's trademarks or intellectual property. It's an experimental \"vibe coding\" project built with Claude Code (Anthropic).",
     "hotseat": {
       "title": "Hot seat",
       "desc": "Play on one screen, passing the device between turns."

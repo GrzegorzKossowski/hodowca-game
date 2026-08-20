@@ -98,7 +98,6 @@ export function ModeScreen() {
         onClick={openRules}
         style={{
           marginTop: 'auto',
-          marginBottom: 8,
           background: 'none',
           border: 'none',
           color: theme.color.textMuted,
@@ -110,6 +109,20 @@ export function ModeScreen() {
       >
         {t('mode.rulesLink')}
       </button>
+
+      <div
+        style={{
+          maxWidth: 520,
+          textAlign: 'center',
+          fontSize: 11.5,
+          lineHeight: 1.5,
+          color: theme.color.textMuted,
+          opacity: 0.75,
+          padding: '0 12px 8px',
+        }}
+      >
+        {t('mode.disclaimer')}
+      </div>
     </div>
   )
 }
