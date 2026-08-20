@@ -89,7 +89,8 @@
     "youLabel": "YOU",
     "yourTurnLabel": "👉 YOUR TURN",
     "notYourTurn": "not your turn",
-    "turnChangeWait": "Wait for your turn…",
+    "turnChangeWait": "WAIT…",
+    "turnChangeNowLabel": "Now playing",
     "nextStepHint": "You can now trade animals or end your turn.",
     "botTurn": {
       "thinking": "is thinking…",

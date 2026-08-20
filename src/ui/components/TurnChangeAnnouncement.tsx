@@ -57,11 +57,12 @@ export function TurnChangeAnnouncement() {
           boxShadow: '0 12px 32px rgba(0,0,0,0.18)',
         }}
       >
+        <div style={{ fontFamily: theme.font.heading, fontWeight: 800, fontSize: 22, letterSpacing: 1 }}>
+          {t('board.turnChangeWait')}
+        </div>
+        <div style={{ fontSize: 13.5, color: theme.color.textMuted }}>{t('board.turnChangeNowLabel')}</div>
         <div style={{ fontSize: 46 }}>{active.avatar}</div>
         <div style={{ fontFamily: theme.font.heading, fontWeight: 800, fontSize: 19 }}>{active.name}</div>
-        <div style={{ fontSize: 13.5, color: theme.color.textMuted }}>
-          {active.isBot ? t('board.botTurn.thinking') : t('board.turnChangeWait')}
-        </div>
       </div>
     </div>
   )

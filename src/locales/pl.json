@@ -91,7 +91,8 @@
     "youLabel": "TY",
     "yourTurnLabel": "👉 TWOJA TURA",
     "notYourTurn": "nie Twoja tura",
-    "turnChangeWait": "Czekaj na swoją kolej…",
+    "turnChangeWait": "CZEKAJ…",
+    "turnChangeNowLabel": "Teraz tura",
     "nextStepHint": "Możesz teraz wymienić zwierzęta lub zakończyć turę.",
     "botTurn": {
       "thinking": "myśli…",
