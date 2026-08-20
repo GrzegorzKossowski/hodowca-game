@@ -8,6 +8,7 @@ export function ModeScreen() {
   const selectMode = useGameStore((s) => s.selectMode)
   const goOnlineChoice = useGameStore((s) => s.goOnlineChoice)
   const openRules = useGameStore((s) => s.openRules)
+  const openAppHelp = useGameStore((s) => s.openAppHelp)
 
   const modes: { key: Exclude<Mode, null>; emoji: string; title: string; desc: string; warning?: string }[] = [
     { key: 'hotseat', emoji: '📱', title: t('mode.hotseat.title'), desc: t('mode.hotseat.desc') },
@@ -94,21 +95,20 @@ export function ModeScreen() {
         ))}
       </div>
 
-      <button
-        onClick={openRules}
-        style={{
-          marginTop: 'auto',
-          background: 'none',
-          border: 'none',
-          color: theme.color.textMuted,
-          fontSize: 14,
-          textDecoration: 'underline',
-          cursor: 'pointer',
-          padding: 10,
-        }}
-      >
-        {t('mode.rulesLink')}
-      </button>
+      <div style={{ marginTop: 'auto', display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'center' }}>
+        <button
+          onClick={openRules}
+          style={{ background: 'none', border: 'none', color: theme.color.textMuted, fontSize: 14, textDecoration: 'underline', cursor: 'pointer', padding: 10 }}
+        >
+          {t('mode.rulesLink')}
+        </button>
+        <button
+          onClick={openAppHelp}
+          style={{ background: 'none', border: 'none', color: theme.color.textMuted, fontSize: 14, textDecoration: 'underline', cursor: 'pointer', padding: 10 }}
+        >
+          {t('appHelp.title')}
+        </button>
+      </div>
 
       <div
         style={{

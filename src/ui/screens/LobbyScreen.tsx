@@ -239,6 +239,12 @@ export function LobbyScreen() {
             <span>⚠️</span>
             <span>{t('lobby.onlineWarning')}</span>
           </div>
+          <button
+            onClick={s.openAppHelp}
+            style={{ alignSelf: 'center', background: 'none', border: 'none', color: theme.color.textMuted, fontSize: 12.5, textDecoration: 'underline', cursor: 'pointer', padding: 6 }}
+          >
+            {t('appHelp.title')}
+          </button>
         </div>
       )}
 

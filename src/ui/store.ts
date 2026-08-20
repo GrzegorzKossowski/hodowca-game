@@ -105,6 +105,7 @@ interface GameState {
   toast: string | null
   overlay: PredatorOverlay | null
   rulesOpen: boolean
+  appHelpOpen: boolean
   turnTimer: number
   pickingAvatarFor: number | null
   hasRolledThisTurn: boolean
@@ -142,6 +143,8 @@ interface GameState {
   backToMode: () => void
   openRules: () => void
   closeRules: () => void
+  openAppHelp: () => void
+  closeAppHelp: () => void
   setActiveTab: (t: Tab) => void
   showToast: (text: string) => void
 
@@ -462,6 +465,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   toast: null,
   overlay: null,
   rulesOpen: false,
+  appHelpOpen: false,
   turnTimer: 60,
   pickingAvatarFor: null,
   hasRolledThisTurn: false,
@@ -687,6 +691,8 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   openRules: () => set({ rulesOpen: true }),
   closeRules: () => set({ rulesOpen: false }),
+  openAppHelp: () => set({ appHelpOpen: true }),
+  closeAppHelp: () => set({ appHelpOpen: false }),
   setActiveTab: (t) => set({ activeTab: t }),
 
   showToast: (text) => {

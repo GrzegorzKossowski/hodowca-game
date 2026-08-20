@@ -169,5 +169,25 @@
     "ratesLimit": "Up to {{max}} trades per turn.",
     "win": "GOAL",
     "winText": "You win once you hold at least 1 of every animal (rabbit, sheep, pig, cow, horse) and both dogs at the same time."
+  },
+  "appHelp": {
+    "title": "❔ How the app works",
+    "intro": "This isn't the game's rules (those are under \"Rules and exchange rates\") - these are practical notes on using the app itself.",
+    "reload": {
+      "title": "Reloading the page or closing the tab",
+      "text": "Game state only lives in your browser's memory. Reloading the page, closing the tab, or losing your connection means losing this game's progress - there's no way back, you'll need to start a new one."
+    },
+    "hostLeaves": {
+      "title": "The host disconnecting in an online/LAN game",
+      "text": "If the host loses connection, the remaining players automatically elect a new host among themselves and the game continues without interruption. If you were the host and come back, you'll rejoin as a new participant - your previous progress in that game is gone."
+    },
+    "internetNeeded": {
+      "title": "Online/LAN mode needs internet access",
+      "text": "Even if every player is on the same Wi-Fi network, connecting devices to each other requires internet access - it's only used for the initial handshake between devices, the game itself doesn't need to transfer much data afterward."
+    },
+    "leaveGame": {
+      "title": "How to leave a game",
+      "text": "Use the 🚪 button on the board (or the link under the pass-the-device screen) to safely return to mode selection. This also ends the current match with no way to come back to it."
+    }
   }
 }

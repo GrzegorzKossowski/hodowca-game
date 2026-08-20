@@ -11,6 +11,7 @@ import { BoardScreen } from './ui/screens/BoardScreen'
 import { PassScreen } from './ui/screens/PassScreen'
 import { WinScreen } from './ui/screens/WinScreen'
 import { RulesModal } from './ui/components/RulesModal'
+import { AppHelpModal } from './ui/components/AppHelpModal'
 import { EventOverlay } from './ui/components/EventOverlay'
 import { Toast } from './ui/components/Toast'
 import { TurnChangeAnnouncement } from './ui/components/TurnChangeAnnouncement'
@@ -54,6 +55,7 @@ function App() {
     >
       <CurrentScreen />
       <RulesModal />
+      <AppHelpModal />
       <EventOverlay />
       <TurnChangeAnnouncement />
       <Toast />

@@ -171,5 +171,25 @@
     "ratesLimit": "Maksymalnie {{max}} wymiany na turę.",
     "win": "CEL GRY",
     "winText": "Wygrywasz, gdy posiadasz jednocześnie co najmniej 1 sztukę każdego zwierzęcia (królik, owca, świnia, krowa, koń) oraz oba psy."
+  },
+  "appHelp": {
+    "title": "❔ Jak działa aplikacja",
+    "intro": "To nie są zasady gry (te znajdziesz pod „Zasady i przeliczniki”) — to praktyczne wskazówki dotyczące korzystania z samej aplikacji.",
+    "reload": {
+      "title": "Odświeżenie strony lub zamknięcie karty",
+      "text": "Stan rozgrywki żyje tylko w pamięci Twojej przeglądarki. Odświeżenie strony, zamknięcie karty albo zerwanie połączenia oznacza utratę postępu tej gry — nie da się do niej wrócić, trzeba zacząć nową."
+    },
+    "hostLeaves": {
+      "title": "Rozłączenie hosta w grze online/LAN",
+      "text": "Gdy host straci połączenie, pozostali gracze automatycznie wybierają spośród siebie nowego hosta i gra toczy się dalej bez przerywania. Jeśli to Ty byłeś hostem i wrócisz — dołączysz jako nowy uczestnik, a Twój dotychczasowy postęp w tej rozgrywce przepada."
+    },
+    "internetNeeded": {
+      "title": "Gra online/LAN wymaga internetu",
+      "text": "Nawet jeśli wszyscy gracze są w tej samej sieci Wi-Fi, nawiązanie połączenia między urządzeniami wymaga dostępu do internetu — jest on używany tylko do wstępnego znalezienia się urządzeń, sama gra potem nie potrzebuje transferu dużych danych."
+    },
+    "leaveGame": {
+      "title": "Jak wyjść z gry",
+      "text": "Użyj przycisku 🚪 na planszy (lub linku pod ekranem przekazania urządzenia), żeby bezpiecznie wrócić do wyboru trybu. To też kończy trwającą rozgrywkę bez możliwości powrotu."
+    }
   }
 }
