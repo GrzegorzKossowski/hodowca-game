@@ -23,4 +23,4 @@ export const AVATARS = [
   '🐼', '🐯', '🦁', '🐵', '🐔', '🦆', '🦉',
 ] as const
 
-export const NAME_POOL = ['Grzegorz', 'Wioletta', 'Oliwia', 'Tomek', 'Ola', 'Bartek']
+export const NAME_POOL = ['Ania', 'Bartek', 'Celina', 'Dawid', 'Ela', 'Franek']
