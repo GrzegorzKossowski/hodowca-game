@@ -132,8 +132,8 @@
     "wolfSaved": "Duży pies odgonił wilka!",
     "foxAttack": "Lis zaatakował!",
     "wolfAttack": "Wilk zaatakował!",
-    "foxSavedText": "Twoja hodowla jest bezpieczna — tym razem obyło się bez strat.",
-    "wolfSavedText": "Twoja hodowla jest bezpieczna — tym razem obyło się bez strat.",
+    "foxSavedText": "Stado bezpieczne, ale mały pies odszedł broniąc go i wraca do wspólnej puli.",
+    "wolfSavedText": "Stado bezpieczne, ale duży pies odszedł broniąc go i wraca do wspólnej puli.",
     "foxAttackText": "Straciłeś wszystkie króliki ze stada.",
     "wolfAttackText": "Straciłeś część większych zwierząt ze stada.",
     "ok": "OK"
@@ -148,6 +148,6 @@
     "title": "📖 Zasady i przeliczniki",
     "rates": "PRZELICZNIKI",
     "predators": "DRAPIEŻNIKI",
-    "predatorsText": "🦊 Lis zjada króliki. 🐺 Wilk poluje na większe zwierzęta. Mały pies 🐕 odgania lisa, duży pies 🐕‍🦺 odgania wilka."
+    "predatorsText": "🦊 Lis zjada króliki i owce. 🐺 Wilk poluje na świnie, krowy i konie. Mały pies 🐕 odgania lisa, duży pies 🐕‍🦺 odgania wilka — ale pies po obronie wraca do wspólnej puli i trzeba go zdobyć ponownie."
   }
 }

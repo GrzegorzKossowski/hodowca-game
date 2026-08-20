@@ -80,7 +80,21 @@ export function BoardScreen() {
         </div>
         <div style={{ fontSize: 12.5, color: theme.color.textMuted }}>{t('board.turnLabel')}</div>
         {s.timerEnabled && (
-          <div style={{ marginLeft: 'auto', fontFamily: theme.font.heading, fontWeight: 700, fontSize: 14, color: theme.color.danger, background: theme.color.dangerBg, padding: '5px 10px', borderRadius: 999 }}>
+            <div
+            style={{
+              marginLeft: 'auto',
+              fontFamily: theme.font.heading,
+              fontWeight: 700,
+              fontSize: 14,
+              fontVariantNumeric: 'tabular-nums',
+              color: theme.color.danger,
+              background: theme.color.dangerBg,
+              padding: '5px 10px',
+              borderRadius: 999,
+              minWidth: 58,
+              textAlign: 'center',
+            }}
+          >
             ⏱ {s.turnTimer}s
           </div>
         )}
@@ -117,6 +131,7 @@ export function BoardScreen() {
           disabled={s.diceRolling || s.hasRolledThisTurn || !isMyTurn}
           style={{
             alignSelf: 'center',
+            minWidth: 176,
             padding: '14px 22px',
             borderRadius: 14,
             border: 'none',
@@ -134,14 +149,9 @@ export function BoardScreen() {
         </button>
       </div>
 
-      {!isMyTurn && (
-        <div style={{ textAlign: 'center', fontSize: 13.5, color: theme.color.textMuted, padding: '8px 16px 0' }}>
-          {t('board.waitingFor', { player: activePlayer.name })}
-        </div>
-      )}
-      {isMyTurn && diceResultText && (
-        <div style={{ textAlign: 'center', fontSize: 13.5, color: theme.color.textMuted, padding: '8px 16px 0' }}>{diceResultText}</div>
-      )}
+      <div style={{ textAlign: 'center', fontSize: 13.5, color: theme.color.textMuted, padding: '8px 16px', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {!isMyTurn ? t('board.waitingFor', { player: activePlayer.name }) : s.diceRolling ? t('board.rolling') : diceResultText}
+      </div>
 
       {isMobile && (
         <div style={{ display: 'flex', borderBottom: `1.5px solid ${theme.color.cardBorder}`, background: theme.color.cardBg }}>
@@ -299,14 +309,16 @@ export function BoardScreen() {
             disabled={!s.hasRolledThisTurn || !isMyTurn}
             style={{
               flex: 1,
-              minWidth: 160,
-              padding: 12,
-              borderRadius: 12,
+              minWidth: 220,
+              minHeight: 56,
+              padding: '16px 24px',
+              borderRadius: 14,
               border: 'none',
               background: theme.color.accent,
               color: theme.color.white,
+              fontFamily: theme.font.heading,
               fontWeight: 700,
-              fontSize: 13,
+              fontSize: 17,
               cursor: s.hasRolledThisTurn && isMyTurn ? 'pointer' : 'not-allowed',
               opacity: s.hasRolledThisTurn && isMyTurn ? 1 : 0.5,
             }}

@@ -7,6 +7,8 @@ const RATES: [string, string][] = [
   ['🐑 × 2', '🐷 × 1'],
   ['🐷 × 3', '🐄 × 1'],
   ['🐄 × 2', '🐴 × 1'],
+  ['🐴 × 1', '🐕 × 1'],
+  ['🐴 × 2', '🐕‍🦺 × 1'],
 ]
 
 export function RulesModal() {
@@ -16,8 +18,14 @@ export function RulesModal() {
   if (!rulesOpen) return null
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: theme.color.overlayWarm, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 50 }}>
-      <div style={{ background: theme.color.white, borderRadius: '24px 24px 0 0', padding: '24px 20px 28px', maxWidth: 480, width: '100%', maxHeight: '80vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <div
+      onClick={closeRules}
+      style={{ position: 'fixed', inset: 0, background: theme.color.overlayWarm, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 50 }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{ background: theme.color.white, borderRadius: '24px 24px 0 0', padding: '24px 20px 28px', maxWidth: 480, width: '100%', maxHeight: '80vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14 }}
+      >
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <div style={{ fontFamily: theme.font.heading, fontWeight: 800, fontSize: 19 }}>{t('rules.title')}</div>
           <button onClick={closeRules} style={{ marginLeft: 'auto', background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: theme.color.textMuted }}>

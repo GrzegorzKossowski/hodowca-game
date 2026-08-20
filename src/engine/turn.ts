@@ -1,4 +1,4 @@
-import type { AnimalKey, Herd } from './animals'
+import type { AnimalKey, Herd, HerdKey } from './animals'
 import { isPredator, rollDice, type DiceRoll, type RandomFn } from './dice'
 import { resolvePredator } from './predators'
 
@@ -22,11 +22,11 @@ function applyFace(herd: Herd, pool: Herd, events: DiceEvent[], face: DiceRoll['
     if (result.blocked) {
       events.push({ kind: 'predatorBlocked', predator: face })
     } else {
-      events.push({ kind: 'predatorAttack', predator: face, lost: result.lost })
-      // Eaten animals return to the main pool for other players to draw from.
-      for (const [animal, amount] of Object.entries(result.lost)) {
-        pool = { ...pool, [animal]: pool[animal as AnimalKey] + (amount ?? 0) }
-      }
+      events.push({ kind: 'predatorAttack', predator: face, lost: result.lost as Partial<Record<AnimalKey, number>> })
+    }
+    // Eaten animals, or a guard dog used up blocking the attack, return to the main pool.
+    for (const [key, amount] of Object.entries(result.lost)) {
+      pool = { ...pool, [key]: pool[key as HerdKey] + (amount ?? 0) }
     }
     return { herd, pool }
   }

@@ -3,12 +3,14 @@ import { makeHerd } from './animals'
 import { resolvePredator } from './predators'
 
 describe('resolvePredator', () => {
-  it('blocks a fox attack when the herd has a small dog', () => {
+  it('blocks a fox attack when the herd has a small dog, but the dog is used up', () => {
     const herd = makeHerd([3, 2, 0, 0, 0, 1, 0])
     const result = resolvePredator(herd, 'fox')
     expect(result.blocked).toBe(true)
-    expect(result.lost).toEqual({})
-    expect(result.herd).toEqual(herd)
+    expect(result.lost).toEqual({ dogSmall: 1 })
+    expect(result.herd.dogSmall).toBe(0)
+    expect(result.herd.rabbit).toBe(3)
+    expect(result.herd.sheep).toBe(2)
   })
 
   it('wipes out the small pen on an unguarded fox attack', () => {
@@ -25,11 +27,15 @@ describe('resolvePredator', () => {
     expect(result.herd.dogBig).toBe(1)
   })
 
-  it('blocks a wolf attack when the herd has a big dog', () => {
+  it('blocks a wolf attack when the herd has a big dog, but the dog is used up', () => {
     const herd = makeHerd([0, 0, 2, 2, 1, 0, 1])
     const result = resolvePredator(herd, 'wolf')
     expect(result.blocked).toBe(true)
-    expect(result.herd).toEqual(herd)
+    expect(result.lost).toEqual({ dogBig: 1 })
+    expect(result.herd.dogBig).toBe(0)
+    expect(result.herd.pig).toBe(2)
+    expect(result.herd.cow).toBe(2)
+    expect(result.herd.horse).toBe(1)
   })
 
   it('wipes out the big pen on an unguarded wolf attack', () => {

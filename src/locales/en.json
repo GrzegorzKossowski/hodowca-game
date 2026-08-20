@@ -130,8 +130,8 @@
     "wolfSaved": "The big dog chased off the wolf!",
     "foxAttack": "The fox attacked!",
     "wolfAttack": "The wolf attacked!",
-    "foxSavedText": "Your herd is safe — no losses this time.",
-    "wolfSavedText": "Your herd is safe — no losses this time.",
+    "foxSavedText": "Your herd is safe, but the small dog was used up defending it and returns to the shared pool.",
+    "wolfSavedText": "Your herd is safe, but the big dog was used up defending it and returns to the shared pool.",
     "foxAttackText": "You lost all the rabbits in your herd.",
     "wolfAttackText": "You lost some of your larger animals.",
     "ok": "OK"
@@ -146,6 +146,6 @@
     "title": "📖 Rules and exchange rates",
     "rates": "EXCHANGE RATES",
     "predators": "PREDATORS",
-    "predatorsText": "🦊 The fox eats rabbits. 🐺 The wolf hunts larger animals. A small dog 🐕 chases off the fox, a big dog 🐕‍🦺 chases off the wolf."
+    "predatorsText": "🦊 The fox eats rabbits and sheep. 🐺 The wolf hunts pigs, cows and horses. A small dog 🐕 chases off the fox, a big dog 🐕‍🦺 chases off the wolf — but the dog returns to the shared pool after defending, so you'll need to earn a new one."
   }
 }

@@ -30,13 +30,14 @@ describe('playTurn', () => {
     expect(result.events[0]).toEqual({ kind: 'poolEmpty', animal: 'rabbit' })
   })
 
-  it('blocks a fox attack when the player has a small dog, without consuming it', () => {
+  it('blocks a fox attack when the player has a small dog, but uses the dog up and returns it to the pool', () => {
     const herd = makeHerd([3, 2, 0, 0, 0, 1, 0])
     const pool = makeHerd([10, 10, 10, 10, 10, 10, 10])
     // rng near 1 -> small index 5 -> fox; big index 5 -> wolf
     const result = playTurn(herd, pool, () => 0.999999)
     expect(result.roll.small).toBe('fox')
-    expect(result.herd.dogSmall).toBe(1)
+    expect(result.herd.dogSmall).toBe(0)
+    expect(result.pool.dogSmall).toBe(11)
     expect(result.herd.rabbit).toBe(3)
     expect(result.herd.sheep).toBe(2)
     expect(result.events[0]).toEqual({ kind: 'predatorBlocked', predator: 'fox' })
