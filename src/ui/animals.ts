@@ -19,8 +19,8 @@ export const HERD_EMOJI: Record<HerdKey, string> = {
 export const PREDATOR_EMOJI = { fox: '🦊', wolf: '🐺' } as const
 
 export const AVATARS = [
-  '🐻', '🐨', '🐧', '🐢', '🐸', '🐶', '🐱', '🐭', '🐹',
+  '🐻', '🐱', '🐭', '🐨', '🐧', '🐢', '🐸', '🐶', '🐹',
   '🐼', '🐯', '🦁', '🐵', '🐔', '🦆', '🦉',
 ] as const
 
-export const NAME_POOL = ['Ania', 'Marek', 'Zosia', 'Tomek', 'Ola', 'Bartek']
+export const NAME_POOL = ['Grzegorz', 'Wioletta', 'Oliwia', 'Tomek', 'Ola', 'Bartek']
