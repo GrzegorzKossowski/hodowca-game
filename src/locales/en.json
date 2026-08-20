@@ -123,7 +123,8 @@
       "predatorBlocked": "{{player}}: a {{predator}} showed up, but the dog chased it off!",
       "predatorAttack": "Watch out! {{player}} loses from the herd: {{lost}} ({{predator}} attacked).",
       "trade": "{{player}} trades {{give}} for {{get}}.",
-      "playerLeft": "{{player}} disconnected from the game."
+      "playerLeft": "{{player}} disconnected from the game.",
+      "turnSkipped": "{{player}} ran out of time to roll — turn skipped."
     },
     "endTurn": "End turn →",
     "leaveGame": "Leave game",

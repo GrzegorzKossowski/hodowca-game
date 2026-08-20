@@ -125,7 +125,8 @@
       "predatorBlocked": "{{player}}: {{predator}} nadszedł, ale pies go odgonił!",
       "predatorAttack": "Uwaga! {{player}} traci ze stada: {{lost}} (napadł {{predator}}).",
       "trade": "{{player}} wymienia {{give}} na {{get}}.",
-      "playerLeft": "{{player}} rozłączył(a) się z gry."
+      "playerLeft": "{{player}} rozłączył(a) się z gry.",
+      "turnSkipped": "{{player}} nie zdążył(a) rzucić kośćmi na czas — tura pominięta."
     },
     "endTurn": "Zakończ turę →",
     "leaveGame": "Wyjdź z gry",
