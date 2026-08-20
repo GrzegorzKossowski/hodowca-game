@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { theme } from '../theme'
 import { useGameStore } from '../store'
+import { MAX_TRADES_PER_TURN } from '../../engine'
 
 const RATES: [string, string][] = [
   ['🐰 × 6', '🐑 × 1'],
@@ -40,8 +41,13 @@ export function RulesModal() {
             <span>{to}</span>
           </div>
         ))}
+        <div style={{ fontSize: 13, color: theme.color.textMuted, lineHeight: 1.5 }}>{t('rules.ratesLimit', { max: MAX_TRADES_PER_TURN })}</div>
+
         <div style={{ fontSize: 13, color: theme.color.textMuted, fontWeight: 600, marginTop: 4 }}>{t('rules.predators')}</div>
         <div style={{ fontSize: 14, lineHeight: 1.6 }}>{t('rules.predatorsText')}</div>
+
+        <div style={{ fontSize: 13, color: theme.color.textMuted, fontWeight: 600, marginTop: 4 }}>{t('rules.win')}</div>
+        <div style={{ fontSize: 14, lineHeight: 1.6 }}>{t('rules.winText')}</div>
       </div>
     </div>
   )

@@ -157,6 +157,9 @@
     "title": "📖 Zasady i przeliczniki",
     "rates": "PRZELICZNIKI",
     "predators": "DRAPIEŻNIKI",
-    "predatorsText": "🦊 Lis zjada króliki i owce. 🐺 Wilk poluje na świnie, krowy i konie. Mały pies 🐕 odgania lisa, duży pies 🐕‍🦺 odgania wilka — ale pies po obronie wraca do wspólnej puli i trzeba go zdobyć ponownie."
+    "predatorsText": "🦊 Lis zjada króliki i owce. 🐺 Wilk poluje na świnie, krowy i konie. Mały pies 🐕 odgania lisa, duży pies 🐕‍🦺 odgania wilka — ale pies po obronie wraca do wspólnej puli i trzeba go zdobyć ponownie.",
+    "ratesLimit": "Maksymalnie {{max}} wymiany na turę.",
+    "win": "CEL GRY",
+    "winText": "Wygrywasz, gdy posiadasz jednocześnie co najmniej 1 sztukę każdego zwierzęcia (królik, owca, świnia, krowa, koń) oraz oba psy."
   }
 }

@@ -155,6 +155,9 @@
     "title": "📖 Rules and exchange rates",
     "rates": "EXCHANGE RATES",
     "predators": "PREDATORS",
-    "predatorsText": "🦊 The fox eats rabbits and sheep. 🐺 The wolf hunts pigs, cows and horses. A small dog 🐕 chases off the fox, a big dog 🐕‍🦺 chases off the wolf — but the dog returns to the shared pool after defending, so you'll need to earn a new one."
+    "predatorsText": "🦊 The fox eats rabbits and sheep. 🐺 The wolf hunts pigs, cows and horses. A small dog 🐕 chases off the fox, a big dog 🐕‍🦺 chases off the wolf — but the dog returns to the shared pool after defending, so you'll need to earn a new one.",
+    "ratesLimit": "Up to {{max}} trades per turn.",
+    "win": "GOAL",
+    "winText": "You win once you hold at least 1 of every animal (rabbit, sheep, pig, cow, horse) and both dogs at the same time."
   }
 }
