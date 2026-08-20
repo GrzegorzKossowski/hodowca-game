@@ -30,6 +30,14 @@ export function PassScreen() {
       >
         {t('pass.confirm')}
       </button>
+      <button
+        onClick={() => {
+          if (window.confirm(t('board.leaveConfirm'))) s.backToMode()
+        }}
+        style={{ marginTop: 4, background: 'none', border: 'none', color: theme.color.textMuted, fontSize: 13, cursor: 'pointer', textDecoration: 'underline' }}
+      >
+        {t('board.leaveGame')}
+      </button>
     </div>
   )
 }

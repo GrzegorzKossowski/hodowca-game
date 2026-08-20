@@ -1,9 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { theme } from '../theme'
-import { useGameStore, type Tab } from '../store'
+import { useGameStore, isLocalHumanTurn, type Tab } from '../store'
 import { ANIMAL_KEYS, HERD_EMOJI } from '../animals'
 import { TRADE_RECIPES, MAX_TRADES_PER_TURN, canAffordTrade, poolHasStock } from '../../engine'
-import { myPeerId } from '../../net/room'
 import { BotTurnBanner } from '../components/BotTurnBanner'
 
 const TAB_ICONS: Record<Tab, string> = { herd: '🐄', trade: '🔄', rivals: '👥', log: '📜' }
@@ -15,7 +14,7 @@ export function BoardScreen() {
   const isMobile = !isDesktop
 
   const activePlayer = s.players[s.currentPlayerIdx] ?? { name: '—', avatar: '🐻', herd: undefined, peerId: undefined, isBot: false }
-  const isMyTurn = activePlayer.isBot ? false : s.mode === 'online' ? activePlayer.peerId === myPeerId : true
+  const isMyTurn = isLocalHumanTurn(s)
   const rivals = s.players.filter((_, i) => i !== s.currentPlayerIdx)
   const rivalLimit = isDesktop ? 5 : 3
   const visibleRivals = rivals.slice(0, rivalLimit)
@@ -100,12 +99,24 @@ export function BoardScreen() {
             ⏱ {s.turnTimer}s
           </div>
         )}
-        <button
-          onClick={s.openRules}
-          style={{ marginLeft: s.timerEnabled ? 0 : 'auto', width: 34, height: 34, borderRadius: '50%', border: `1.5px solid ${theme.color.cardBorder}`, background: 'none', cursor: 'pointer', fontSize: 14 }}
-        >
-          ?
-        </button>
+        <div style={{ marginLeft: s.timerEnabled ? 0 : 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            onClick={s.openRules}
+            style={{ width: 34, height: 34, borderRadius: '50%', border: `1.5px solid ${theme.color.cardBorder}`, background: 'none', cursor: 'pointer', fontSize: 14 }}
+          >
+            ?
+          </button>
+          <button
+            onClick={() => {
+              if (window.confirm(t('board.leaveConfirm'))) s.backToMode()
+            }}
+            title={t('board.leaveGame')}
+            aria-label={t('board.leaveGame')}
+            style={{ width: 34, height: 34, borderRadius: '50%', border: `1.5px solid ${theme.color.cardBorder}`, background: 'none', cursor: 'pointer', fontSize: 15, color: theme.color.danger }}
+          >
+            🚪
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: 18, padding: '18px 16px', background: theme.color.accentBg }}>

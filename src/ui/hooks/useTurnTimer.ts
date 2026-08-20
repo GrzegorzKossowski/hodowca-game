@@ -1,16 +1,7 @@
 import { useEffect } from 'react'
-import { useGameStore } from '../store'
-import { myPeerId } from '../../net/room'
+import { useGameStore, isLocalHumanTurn } from '../store'
 
 const TURN_SECONDS = 60
-
-function isLocalTurn(s: ReturnType<typeof useGameStore.getState>): boolean {
-  const active = s.players[s.currentPlayerIdx]
-  if (!active) return false
-  if (s.mode === 'online') return active.peerId === myPeerId
-  if (s.mode === 'bots') return !active.isBot
-  return true
-}
 
 /** Ticks the on-screen 60s turn badge down once a second, and — only for the locally-controlled
  * player — auto-rolls (if not yet rolled) and then auto-ends the turn once time runs out, so the
@@ -31,7 +22,7 @@ export function useTurnTimer() {
       if (s.screen !== 'board' || !s.timerEnabled) return
       const next = Math.max(0, s.turnTimer - 1)
       useGameStore.setState({ turnTimer: next })
-      if (next === 0 && isLocalTurn(s)) {
+      if (next === 0 && isLocalHumanTurn(s)) {
         if (!s.hasRolledThisTurn) s.rollDice()
         else s.endTurn()
       }

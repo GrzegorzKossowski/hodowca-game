@@ -48,6 +48,7 @@ interface JoinPayload {
 interface LobbySnapshot {
   players: Player[]
   hostPeerId: string
+  timerEnabled: boolean
 }
 
 interface GameActionPayload {
@@ -65,6 +66,7 @@ interface GameStateSnapshot {
   overlay: PredatorOverlay | null
   hasRolledThisTurn: boolean
   tradesThisTurn: number
+  timerEnabled: boolean
   screen: Screen
 }
 
@@ -156,8 +158,37 @@ interface GameState {
 /** A fresh, collision-free id for a player being appended to an existing (possibly already
  * trimmed-down, e.g. after a removal) roster — using array length here would risk reusing an id
  * still held by another player. */
+/** Whether it's the local human's turn to act right now — false for a bot's turn (even one this
+ * browser is host-driving) and, in online mode, false for any other connected player's turn. Shared
+ * by BoardScreen (button gating), useTurnTimer, and EventOverlay (only the active player should be
+ * forced to click a predator-event modal closed; bystanders just see it and it clears on its own). */
+export function isLocalHumanTurn(s: GameState): boolean {
+  const active = s.players[s.currentPlayerIdx]
+  if (!active || active.isBot) return false
+  if (s.mode === 'online') return active.peerId === myPeerId
+  return true
+}
+
 function nextPlayerId(players: Player[]): number {
   return players.reduce((max, p) => Math.max(max, p.id), -1) + 1
+}
+
+/** Shared-game-progress fields to reset whenever a fresh game is being configured (mode select,
+ * hosting, or joining) — without this, leaving a game via backToMode and starting another one in
+ * the same session would inherit the previous game's depleted pool, log, and turn state instead of
+ * starting clean (the only way to get a truly fresh state used to be reloading the page). */
+function freshGameProgress() {
+  return {
+    mainPool: makeHerd([54, 22, 18, 14, 9, 4, 2]),
+    log: [] as LogEntry[],
+    currentPlayerIdx: 0,
+    diceRolling: false,
+    diceResult: null as { a: string; b: string } | null,
+    overlay: null as PredatorOverlay | null,
+    hasRolledThisTurn: false,
+    tradesThisTurn: 0,
+    turnTimer: 60,
+  }
 }
 
 function buildPlayers(n: number, botCount: number): Player[] {
@@ -247,6 +278,7 @@ function snapshotOf(s: GameState): GameStateSnapshot {
     overlay: s.overlay,
     hasRolledThisTurn: s.hasRolledThisTurn,
     tradesThisTurn: s.tradesThisTurn,
+    timerEnabled: s.timerEnabled,
     screen: s.screen,
   }
 }
@@ -288,16 +320,21 @@ function createNetActions(room: Room): NetContext {
   return { room, joinAction, lobbyAction, actAction, syncAction }
 }
 
+/** Sends the host's authoritative lobby state (roster + shared settings like the turn timer) to
+ * every guest — the timer toggle in particular must be a single shared setting the host decides,
+ * not something each guest can silently flip only for themselves. */
+function sendLobbySnapshot(get: () => GameState, players: Player[]) {
+  const s = get()
+  netCtx?.lobbyAction.send({ players, hostPeerId: myPeerId, timerEnabled: s.timerEnabled })
+}
+
 /** Wires up the host-only message handlers (join requests, action requests from guests) on the
  * current netCtx. Used both when first hosting and when a guest is promoted after host failover. */
 function attachHostHandlers(get: () => GameState, set: (partial: Partial<GameState>) => void) {
   if (!netCtx) return
   const { joinAction, actAction } = netCtx
 
-  const broadcastLobby = () => {
-    const s = get()
-    netCtx?.lobbyAction.send({ players: s.players, hostPeerId: myPeerId })
-  }
+  const broadcastLobby = () => sendLobbySnapshot(get, get().players)
 
   joinAction.onMessage = (data, ctx) => {
     const s = get()
@@ -361,7 +398,7 @@ function handlePeerLeave(get: () => GameState, set: (partial: Partial<GameState>
     if (s.netRole !== 'host') return
     const players = s.players.filter((p) => p.peerId !== peerId)
     set({ players })
-    netCtx?.lobbyAction.send({ players, hostPeerId: myPeerId })
+    sendLobbySnapshot(get, players)
     return
   }
 
@@ -446,7 +483,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     const botCount = mode === 'bots' ? numBots : 0
     const players = buildPlayers(n, botCount)
     if (mode === 'bots' && players[0]) players[0] = { ...players[0], name: get().soloPlayerName, avatar: get().soloPlayerAvatar }
-    set({ mode, screen: 'lobby', players })
+    set({ mode, screen: 'lobby', players, ...freshGameProgress() })
   },
 
   addPlayer: () => {
@@ -483,7 +520,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     const players = [...s.players, bot]
     set({ players })
     if (s.mode === 'online' && s.netRole === 'host') {
-      netCtx?.lobbyAction.send({ players, hostPeerId: myPeerId })
+      sendLobbySnapshot(get, players)
     }
   },
 
@@ -492,7 +529,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     const players = s.players.filter((p) => p.id !== id)
     set({ players })
     if (s.mode === 'online' && s.netRole === 'host') {
-      netCtx?.lobbyAction.send({ players, hostPeerId: myPeerId })
+      sendLobbySnapshot(get, players)
     }
   },
 
@@ -523,7 +560,13 @@ export const useGameStore = create<GameState>((set, get) => ({
   setBotAggro: (v) => set({ botAggro: v }),
   setSoloPlayerName: (v) => set({ soloPlayerName: v }),
   setSoloPlayerAvatar: (v) => set({ soloPlayerAvatar: v }),
-  toggleTimer: () => set({ timerEnabled: !get().timerEnabled }),
+  toggleTimer: () => {
+    const s = get()
+    if (s.mode === 'online' && s.netRole !== 'host') return
+    const timerEnabled = !s.timerEnabled
+    set({ timerEnabled })
+    if (s.mode === 'online' && s.netRole === 'host') sendLobbySnapshot(get, s.players)
+  },
 
   startGame: () => {
     const s = get()
@@ -681,6 +724,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       roomCode: code,
       players: [hostPlayer],
       screen: 'lobby',
+      ...freshGameProgress(),
     })
   },
 
@@ -695,7 +739,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
     const name = get().onlineName.trim() || 'Gracz'
     const avatar = get().onlineAvatar
-    set({ connecting: true, joinError: null })
+    set({ connecting: true, joinError: null, ...freshGameProgress() })
 
     const room = openRoom(code)
     netCtx = createNetActions(room)
@@ -717,6 +761,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       set({
         players: data.players,
         hostPeerId: data.hostPeerId,
+        timerEnabled: data.timerEnabled,
         connecting: false,
         joinError: null,
         screen: s.screen === 'join' || s.screen === 'online-choice' ? 'lobby' : s.screen,
@@ -734,6 +779,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         overlay: data.overlay,
         hasRolledThisTurn: data.hasRolledThisTurn,
         tradesThisTurn: data.tradesThisTurn,
+        timerEnabled: data.timerEnabled,
         screen: data.screen,
         diceRolling: false,
       })

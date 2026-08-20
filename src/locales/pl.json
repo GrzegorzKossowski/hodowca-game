@@ -63,6 +63,7 @@
     },
     "yourName": "TWOJE IMIĘ",
     "timerToggle": "Limit czasu na turę (60s)",
+    "timerHostOnly": "decyduje host",
     "start": "Rozpocznij grę"
   },
   "onlineChoice": {
@@ -121,7 +122,9 @@
       "trade": "{{player}} wymienia {{give}} na {{get}}.",
       "playerLeft": "{{player}} rozłączył(a) się z gry."
     },
-    "endTurn": "Zakończ turę →"
+    "endTurn": "Zakończ turę →",
+    "leaveGame": "Wyjdź z gry",
+    "leaveConfirm": "Na pewno chcesz opuścić grę? Postęp tej rozgrywki zostanie utracony."
   },
   "pass": {
     "hint": "Przekaż urządzenie graczowi",

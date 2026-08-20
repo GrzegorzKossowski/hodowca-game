@@ -314,9 +314,16 @@ export function LobbyScreen() {
       )}
 
       <div style={{ marginTop: 'auto', paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, color: theme.color.textMuted }}>
-          <input type="checkbox" checked={s.timerEnabled} onChange={s.toggleTimer} style={{ width: 18, height: 18 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, color: theme.color.textMuted, opacity: isGuest ? 0.6 : 1 }}>
+          <input
+            type="checkbox"
+            checked={s.timerEnabled}
+            onChange={s.toggleTimer}
+            disabled={isGuest}
+            style={{ width: 18, height: 18 }}
+          />
           {t('lobby.timerToggle')}
+          {isGuest && <span style={{ fontSize: 12 }}>({t('lobby.timerHostOnly')})</span>}
         </div>
         {isGuest ? (
           <div style={{ textAlign: 'center', fontSize: 13.5, color: theme.color.textMuted, padding: 8 }}>
