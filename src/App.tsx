@@ -1,6 +1,7 @@
 import { theme } from './ui/theme'
 import { useGameStore } from './ui/store'
 import { useIsDesktop } from './ui/hooks/useIsDesktop'
+import { useBotTurn } from './ui/hooks/useBotTurn'
 import { ModeScreen } from './ui/screens/ModeScreen'
 import { OnlineChoiceScreen } from './ui/screens/OnlineChoiceScreen'
 import { JoinScreen } from './ui/screens/JoinScreen'
@@ -34,6 +35,7 @@ function CurrentScreen() {
 
 function App() {
   useIsDesktop()
+  useBotTurn()
 
   return (
     <div

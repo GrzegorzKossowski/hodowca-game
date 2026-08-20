@@ -1,4 +1,5 @@
 export * from './animals'
+export * from './bots'
 export * from './dice'
 export * from './predators'
 export * from './trades'

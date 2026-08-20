@@ -576,7 +576,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       return
     }
     const next = (s.currentPlayerIdx + 1) % s.players.length
-    const nextScreen: Screen = s.mode === 'online' ? 'board' : 'pass'
+    const nextScreen: Screen = s.mode === 'online' || s.mode === 'bots' ? 'board' : 'pass'
     set({ screen: nextScreen, currentPlayerIdx: next, turnTimer: 60, hasRolledThisTurn: false, diceResult: null })
     if (get().netRole === 'host') broadcastState(get())
   },

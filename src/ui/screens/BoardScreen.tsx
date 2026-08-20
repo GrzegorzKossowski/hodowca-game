@@ -14,7 +14,8 @@ export function BoardScreen() {
   const isMobile = !isDesktop
 
   const activePlayer = s.players[s.currentPlayerIdx] ?? { name: '—', avatar: '🐻', herd: undefined, peerId: undefined }
-  const isMyTurn = s.netRole === 'none' || activePlayer.peerId === myPeerId
+  const isMyTurn =
+    s.mode === 'online' ? activePlayer.peerId === myPeerId : s.mode === 'bots' ? !activePlayer.isBot : true
   const rivals = s.players.filter((_, i) => i !== s.currentPlayerIdx)
   const rivalLimit = isDesktop ? 5 : 3
   const visibleRivals = rivals.slice(0, rivalLimit)
@@ -291,7 +292,7 @@ export function BoardScreen() {
         )}
       </div>
 
-      {(s.mode === 'hotseat' || s.mode === 'online') && (
+      {(s.mode === 'hotseat' || s.mode === 'online' || s.mode === 'bots') && (
         <div style={{ padding: 16, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button
             onClick={s.endTurn}
