@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { theme } from '../theme'
 import { useGameStore, isLocalHumanTurn } from '../store'
 
-const ANNOUNCE_MS = 2000
+const ANNOUNCE_MS = 3500
 
 /** A brief, centered, semi-transparent announcement shown only at the moment a turn hands off to
  * someone else (bot or another connected player) — the persistent TurnStatusBanner stays up for the
