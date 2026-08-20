@@ -29,7 +29,7 @@ export function useTurnTimer() {
       if (next === 0 && isLocalHumanTurn(s)) {
         if (!s.hasRolledThisTurn) {
           const player = s.players[s.currentPlayerIdx]
-          const entry = { text: i18n.t('board.log.turnSkipped', { player: player?.name ?? '' }), danger: false }
+          const entry = { text: i18n.t('board.log.turnSkipped', { player: player?.name ?? '' }), danger: false, avatar: player?.avatar }
           useGameStore.setState({ log: [entry, ...s.log] })
         }
         s.endTurn()

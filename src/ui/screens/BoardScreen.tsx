@@ -202,7 +202,7 @@ export function BoardScreen() {
         }}
       >
         {!isMyTurn ? (
-          <>⏳ {t('board.waitingFor', { player: activePlayer.name })}</>
+          <>⏳ {t('board.waitingFor', { player: activePlayer.name })} {activePlayer.avatar}</>
         ) : s.diceRolling ? (
           <>🎲 {t('board.rolling')}</>
         ) : s.hasRolledThisTurn ? (
@@ -261,7 +261,8 @@ export function BoardScreen() {
       >
         {showHerd && (
           <div style={{ background: theme.color.cardBg, borderRadius: isDesktop ? 18 : 0, border: isDesktop ? `1.5px solid ${theme.color.cardBorder}` : 'none', padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15 }}>
+            <div style={{ fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', gap: 6 }}>
+              {!isMyTurn && <span style={{ fontSize: 17 }}>{activePlayer.avatar}</span>}
               {isMyTurn ? t('board.yourHerd') : t('board.theirHerd', { player: activePlayer.name })}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
@@ -385,8 +386,9 @@ export function BoardScreen() {
               <div style={{ background: theme.color.cardBg, borderRadius: 18, border: `1.5px solid ${theme.color.cardBorder}`, padding: 14, display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 320, overflowY: 'auto' }}>
                 <div style={{ fontFamily: theme.font.heading, fontWeight: 700, fontSize: 15 }}>{t('board.logTitle')}</div>
                 {s.log.map((e, i) => (
-                  <div key={i} style={{ fontSize: 13, lineHeight: 1.4, color: e.danger ? theme.color.danger : theme.color.text, paddingBottom: 8, borderBottom: `1px solid ${theme.color.divider}` }}>
-                    {e.text}
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, fontSize: 13, lineHeight: 1.4, color: e.danger ? theme.color.danger : theme.color.text, paddingBottom: 8, borderBottom: `1px solid ${theme.color.divider}` }}>
+                    {e.avatar && <span style={{ fontSize: 14 }}>{e.avatar}</span>}
+                    <span>{e.text}</span>
                   </div>
                 ))}
               </div>

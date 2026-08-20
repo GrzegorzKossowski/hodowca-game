@@ -31,6 +31,7 @@ export interface Player {
 export interface LogEntry {
   text: string
   danger: boolean
+  avatar?: string
 }
 
 export interface PredatorOverlay {
@@ -213,22 +214,25 @@ function animalLabel(key: string, count: number): string {
   return `${count}× ${i18n.t(`common.animal.${key}`)}`
 }
 
-function eventToLogEntry(event: DiceEvent, playerName: string): LogEntry {
+function eventToLogEntry(event: DiceEvent, playerName: string, playerAvatar: string): LogEntry {
   switch (event.kind) {
     case 'gain':
       return {
         text: i18n.t('board.log.gain', { player: playerName, animal: i18n.t(`common.animal.${event.animal}`) }),
         danger: false,
+        avatar: playerAvatar,
       }
     case 'poolEmpty':
       return {
         text: i18n.t('board.log.poolEmpty', { player: playerName, animal: i18n.t(`common.animal.${event.animal}`) }),
         danger: false,
+        avatar: playerAvatar,
       }
     case 'predatorBlocked':
       return {
         text: i18n.t('board.log.predatorBlocked', { player: playerName, predator: i18n.t(`common.predator.${event.predator}`) }),
         danger: false,
+        avatar: playerAvatar,
       }
     case 'predatorAttack': {
       const lost = Object.entries(event.lost)
@@ -237,6 +241,7 @@ function eventToLogEntry(event: DiceEvent, playerName: string): LogEntry {
       return {
         text: i18n.t('board.log.predatorAttack', { player: playerName, predator: i18n.t(`common.predator.${event.predator}`), lost }),
         danger: true,
+        avatar: playerAvatar,
       }
     }
   }
@@ -260,14 +265,14 @@ function buildOverlay(event: Extract<DiceEvent, { kind: 'predatorAttack' | 'pred
   }
 }
 
-function tradeLogEntry(recipe: TradeRecipe, playerName: string): LogEntry {
+function tradeLogEntry(recipe: TradeRecipe, playerName: string, playerAvatar: string): LogEntry {
   const give = Object.entries(recipe.give)
     .map(([k, v]) => animalLabel(k, v ?? 0))
     .join(', ')
   const get = Object.entries(recipe.get)
     .map(([k, v]) => animalLabel(k, v ?? 0))
     .join(', ')
-  return { text: i18n.t('board.log.trade', { player: playerName, give, get }), danger: false }
+  return { text: i18n.t('board.log.trade', { player: playerName, give, get }), danger: false, avatar: playerAvatar }
 }
 
 function snapshotOf(s: GameState): GameStateSnapshot {
@@ -434,7 +439,7 @@ function handlePeerLeave(get: () => GameState, set: (partial: Partial<GameState>
     hasRolledThisTurn: wasCurrentTurn ? false : s.hasRolledThisTurn,
     tradesThisTurn: wasCurrentTurn ? 0 : s.tradesThisTurn,
     diceResult: wasCurrentTurn ? null : s.diceResult,
-    log: [{ text: i18n.t('board.log.playerLeft', { player: left.name }), danger: true }, ...s.log],
+    log: [{ text: i18n.t('board.log.playerLeft', { player: left.name }), danger: true, avatar: left.avatar }, ...s.log],
   })
   broadcastState(get())
 }
@@ -601,7 +606,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
 
       const newPlayers = players.map((p, i) => (i === currentPlayerIdx ? { ...p, herd: result.herd } : p))
-      const newLogEntries = result.events.map((e) => eventToLogEntry(e, activePlayer.name))
+      const newLogEntries = result.events.map((e) => eventToLogEntry(e, activePlayer.name, activePlayer.avatar))
       const predatorEvent = result.events.find(
         (e): e is Extract<DiceEvent, { kind: 'predatorAttack' | 'predatorBlocked' }> =>
           e.kind === 'predatorAttack' || e.kind === 'predatorBlocked',
@@ -645,7 +650,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({
       players: newPlayers,
       mainPool: result.pool,
-      log: [tradeLogEntry(recipe, activePlayer.name), ...log],
+      log: [tradeLogEntry(recipe, activePlayer.name, activePlayer.avatar), ...log],
       tradesThisTurn: tradesThisTurn + 1,
       screen: won ? 'win' : get().screen,
     })
