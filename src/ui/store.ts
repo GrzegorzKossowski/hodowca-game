@@ -423,13 +423,28 @@ function handlePeerLeave(get: () => GameState, set: (partial: Partial<GameState>
     if (newHost.peerId === myPeerId) {
       promoteSelfToHost(get, set, peerId)
     } else {
-      set({ players: remaining, hostPeerId: newHost.peerId })
+      const { players, currentPlayerIdx, wasCurrentTurn } = removePlayerAndFixTurn(s.players, s.currentPlayerIdx, peerId)
+      set({
+        players,
+        currentPlayerIdx,
+        hostPeerId: newHost.peerId,
+        hasRolledThisTurn: wasCurrentTurn ? false : s.hasRolledThisTurn,
+        tradesThisTurn: wasCurrentTurn ? 0 : s.tradesThisTurn,
+        diceResult: wasCurrentTurn ? null : s.diceResult,
+      })
     }
     return
   }
 
   if (s.netRole !== 'host') {
-    set({ players: s.players.filter((p) => p.peerId !== peerId) })
+    const { players, currentPlayerIdx, wasCurrentTurn } = removePlayerAndFixTurn(s.players, s.currentPlayerIdx, peerId)
+    set({
+      players,
+      currentPlayerIdx,
+      hasRolledThisTurn: wasCurrentTurn ? false : s.hasRolledThisTurn,
+      tradesThisTurn: wasCurrentTurn ? 0 : s.tradesThisTurn,
+      diceResult: wasCurrentTurn ? null : s.diceResult,
+    })
     return
   }
   const { players, currentPlayerIdx, wasCurrentTurn } = removePlayerAndFixTurn(s.players, s.currentPlayerIdx, peerId)

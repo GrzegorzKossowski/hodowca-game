@@ -118,7 +118,7 @@ export function BoardScreen() {
               textAlign: 'center',
             }}
           >
-            ⏱ {s.turnTimer}s
+            ⏱ {Math.max(0, s.turnTimer)}s
           </div>
         )}
         <div style={{ marginLeft: s.timerEnabled ? 0 : 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
